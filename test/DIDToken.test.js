@@ -40,11 +40,11 @@ contract('DIDToken', function(accounts) {
   it('should issueDID correctly', async function() {
     await didToken.issueDID(accounts[0], 4321)
     let newSupply = await didToken.totalSupply()
-    assert.equal(newSupply, 4321)
+    assert.equal(newSupply.toString(), 4.321e21)
 
     await didToken.issueDID(accounts[0], 112340876)
     newSupply = await didToken.totalSupply()
-    assert.equal(newSupply.toNumber(), 112345197)
+    assert.equal(newSupply.toNumber(), 1.12345197e26)
   })
 
   it('should disallow issueDID from an empty address', async function() {
@@ -71,7 +71,8 @@ contract('DIDToken', function(accounts) {
       addError = error
     }
     assert.equal(addError, undefined, 'Error must not be thrown')
-    assert.equal(await didToken.getAddressBalance.call(accounts[5]), 9100)
+    const balance = await didToken.getAddressBalance.call(accounts[5])
+    assert.equal(balance.toString(), 9.1e21)
   })
 
   it('should disallow an issueDID call for === 0', async function() {
@@ -85,26 +86,23 @@ contract('DIDToken', function(accounts) {
       addError = error
     }
     assert.notEqual(addError, undefined, 'Error must be thrown')
-    assert.equal(
-      await didToken.totalSupply(),
-      0,
-      'No DID should have been issued'
-    )
+    const totalSupply = await didToken.totalSupply()
+    assert.equal(totalSupply.toString(), 0, 'No DID should have been issued')
   })
 
   it('should correctly calculate the percentDID someone owns', async function() {
     assert.equal(await didToken.totalSupply(), 0)
-    await didToken.issueDID(accounts[0], 200)
+    await didToken.incrementDIDFromContributions(accounts[0], 200)
     let percentDID = await didToken.pctDIDOwned(accounts[0])
-    assert.equal(percentDID.toString(), 100000000000)
+    assert.equal(percentDID.toString(), 100000000000000000000)
 
-    await didToken.issueDID(accounts[1], 100)
+    await didToken.incrementDIDFromContributions(accounts[1], 100)
     percentDID = await didToken.pctDIDOwned(accounts[1])
-    assert.equal(percentDID.toString(), 33333333333)
+    assert.equal(percentDID.toString(), 33333333333333333333)
 
-    await didToken.issueDID(accounts[1], 100)
+    await didToken.incrementDIDFromContributions(accounts[1], 100)
     percentDID = await didToken.pctDIDOwned(accounts[1])
-    assert.equal(percentDID.toString(), 50000000000)
+    assert.equal(percentDID.toString(), 50000000000000000000)
   })
 
   it("should throw an error when someone tries to exchange DID for ether who doesn't own DID", async function() {
@@ -156,19 +154,18 @@ contract('DIDToken', function(accounts) {
   it('should increment the number of DID for those who invest ether', async function() {
     let etherForDIDExchangeError
     await didToken.issueDID(accounts[0], 20000)
-    await didToken.incrementDIDFromContributions(accounts[0], 2000000)
+    await didToken.incrementDIDFromContributions(accounts[0], 20000)
 
     const preInvestDIDBalance = await didToken.getAddressBalance.call(
       accounts[0]
     )
-    const etherToInvest = 2
 
     try {
       await didToken.investEtherForDID(
         {},
         {
           from: accounts[0],
-          value: web3.toWei(etherToInvest, 'ether')
+          value: web3.toWei(2, 'ether')
         }
       )
     } catch (error) {
@@ -183,14 +180,14 @@ contract('DIDToken', function(accounts) {
     const didPerEther = await distense.getParameterValueByTitle('didPerEther')
     assert.equal(
       didPerEther.toString(),
-      1000000000000,
+      1e21,
       'make sure didPerEther is still 1000'
     )
 
     assert.equal(
       postInvestDIDBalance.toNumber(),
-      22000,
-      'accounts[0] DID balance should be 22000'
+      22000e18,
+      'accounts[0] DID balance should be 22000e18'
     )
   })
 
@@ -201,7 +198,7 @@ contract('DIDToken', function(accounts) {
 
     assert.equal(
       DIDBalance.toNumber(),
-      9999,
+      9.999e21,
       'accounts[0] DID balance should be 9999'
     )
   })
@@ -282,16 +279,16 @@ contract('DIDToken', function(accounts) {
 
     const updatedBalance = await didToken.getAddressBalance.call(accounts[1])
     assert.equal(
-      updatedBalance,
-      beginBalance - numDIDToExchange,
+      updatedBalance.toString(),
+      2.001877e24,
       'All of the original DID received should have been exchanged'
     )
   })
 
   it('should increment the investedAddress of an address', async function() {
     //  make sure the contract has ether to return for the DID or this will fail
-    await didToken.issueDID(accounts[1], 1000000)
-    await didToken.incrementDIDFromContributions(accounts[1], 1000000)
+    await didToken.issueDID(accounts[1], 2000000)
+    await didToken.incrementDIDFromContributions(accounts[1], 2000000000)
 
     await didToken.investEtherForDID({
       from: accounts[1],
@@ -301,7 +298,7 @@ contract('DIDToken', function(accounts) {
     let weiInvested = await didToken.getWeiInvested.call(accounts[1])
 
     assert.equal(
-      weiInvested,
+      weiInvested.toString(),
       web3.toWei(2),
       'accounts[1] invested 2 ether at this point'
     )
@@ -316,7 +313,7 @@ contract('DIDToken', function(accounts) {
     assert.equal(
       weiInvested.toString(),
       web3.toWei(5.3),
-      'accounts[1] invested 25 ether at this point'
+      'accounts[1] invested 5.3 ether at this point'
     )
   })
 
@@ -344,28 +341,25 @@ contract('DIDToken', function(accounts) {
 
   it('remainingWeiAggregateMayInvest should return correct values', async function() {
     //  make sure the contract has ether to return for the DID or this will fail
-    await didToken.issueDID(accounts[1], 1000000)
-    await didToken.incrementDIDFromContributions(accounts[1], 1000000)
+    await didToken.incrementDIDFromContributions(accounts[1], 10000)
 
     const aggregateWeiCanInvest = await didToken.investmentLimitAggregate.call()
-
-    const etherToInvest = web3.toWei(10.543)
-    const expected = web3.toWei(aggregateWeiCanInvest - etherToInvest)
 
     await didToken.investEtherForDID(
       {},
       {
         from: accounts[1],
-        value: etherToInvest
+        value: web3.toWei(1, 'ether')
       }
     )
 
     const remainingWei = await didToken.getWeiAggregateMayInvest.call()
     assert.equal(
-      web3.toWei(remainingWei.toString()),
-      expected,
+      remainingWei.toString(),
+      9.998e21,
       'should have reduced remainingWeiAggregateMayInvest by amount of wei invested'
     )
+    // assert.equal(true, false)
   })
 
   it('numWeiAddressMayInvest should prevent those with 0 DID from contributions from contributing', async function() {
@@ -425,14 +419,14 @@ contract('DIDToken', function(accounts) {
   })
 
   it('should fire event "LogIssueDID" and "LogInvestEtherForDID investEtherForDID is called', async function() {
-    await didToken.issueDID(accounts[0], 1200000)
-    await didToken.incrementDIDFromContributions(accounts[0], 1200000)
+    await didToken.issueDID(accounts[0], 120000)
+    await didToken.incrementDIDFromContributions(accounts[0], 120000)
 
     await didToken.investEtherForDID(
       {},
       {
         from: accounts[0],
-        value: web3.toWei(2, 'ether')
+        value: web3.toWei(1, 'ether')
       }
     )
 
@@ -458,7 +452,7 @@ contract('DIDToken', function(accounts) {
     assert.equal(LogInvestEtherForDID.length, 1, 'should be 1 event')
     eventArgs = LogInvestEtherForDID[0].args
     assert.equal(eventArgs.to, accounts[0])
-    assert.isAbove(web3.toWei(eventArgs.numWei), web3.toWei(2))
+    assert.equal(eventArgs.numWei.toString(), web3.toWei(1))
   })
 
   it('should delete DIDHolders from the DIDHoldersArray who own 0 DID', async function() {
@@ -466,6 +460,7 @@ contract('DIDToken', function(accounts) {
     await didToken.issueDID(accounts[5], 101)
     await didToken.issueDID(accounts[4], 100)
     await didToken.issueDID(accounts[3], 102)
+    await didToken.issueDID(accounts[0], 102)
     await didToken.incrementDIDFromContributions(accounts[0], 20000)
 
     await didToken.investEtherForDID({
@@ -480,19 +475,27 @@ contract('DIDToken', function(accounts) {
     const numDIDHolders = await didToken.getNumDIDHolders.call()
     assert.equal(
       numDIDHolders.toString(),
-      2,
-      'should only be 1 DID holder here'
+      3,
+      'should only be 3 DID holders here'
     )
 
     //  Verify correct address was deleted
     const balance5 = await didToken.getAddressBalance.call(accounts[5])
-    assert.equal(balance5, 101, 'accounts[5] should still own 101 DID')
+    assert.equal(
+      balance5.toString(),
+      101000000000000000000,
+      'accounts[5] should still own 101 DID'
+    )
 
     const balance4 = await didToken.getAddressBalance.call(accounts[4])
-    assert.equal(balance4, 0, 'accounts[4] should own 0 DID')
+    assert.equal(balance4.toString(), 0, 'accounts[4] should own 0 DID')
 
     const balance3 = await didToken.getAddressBalance.call(accounts[3])
-    assert.equal(balance3, 102, 'accounts[4] should own 0 DID')
+    assert.equal(
+      balance3.toString(),
+      102000000000000000000,
+      'accounts[4] should own 0 DID'
+    )
   })
 
   it('should limit investing ether to the amount they have earned from contributions', async function() {
@@ -541,47 +544,25 @@ contract('DIDToken', function(accounts) {
       web3.toWei(0.1, 'ether'),
       1000
     )
-    assert.equal(DID, 100)
+    assert.equal(DID.toString(), 100000000000000000000)
 
     DID = await didToken.calculateNumDIDToIssue.call(
       web3.toWei(0.5, 'ether'),
       1000
     )
-    assert.equal(DID.toString(), 500)
+    assert.equal(DID.toString(), 500000000000000000000)
 
     DID = await didToken.calculateNumDIDToIssue.call(
       web3.toWei(1.1, 'ether'),
       1100
     )
-    assert.equal(DID.toString(), 1210)
+    assert.equal(DID.toString(), 1.21e21)
 
     DID = await didToken.calculateNumDIDToIssue.call(
       web3.toWei(3.3333, 'ether'),
       1100
     )
-    assert.equal(DID.toString(), 3666)
-  })
-
-  it('investedOneDIDWorth', async function() {
-    let etherForDIDExchangeError
-    let returnValue = await didToken.investedOneDIDWorth(
-      web3.toWei(0.2, 'ether'),
-      1000
-    )
-    assert.equal(returnValue, true)
-
-    returnValue = await didToken.investedOneDIDWorth(
-      web3.toWei(0.1, 'ether'),
-      100
-    )
-    assert.equal(returnValue, true)
-
-    try {
-      await didToken.investedOneDIDWorth(web3.toWei(0.001, 'ether'), 1000)
-    } catch (error) {
-      etherForDIDExchangeError = error
-    }
-    assert.notEqual(etherForDIDExchangeError, undefined)
+    assert.equal(DID.toString(), 3.66663e21)
   })
 
   it('investEtherForDID should decrement the ContributionsDID of an address', async function() {
@@ -597,6 +578,10 @@ contract('DIDToken', function(accounts) {
     const netContributionsDID = await didToken.getNetNumContributionsDID.call(
       accounts[1]
     )
-    assert.isBelow(netContributionsDID, 10000, '')
+    assert.isBelow(
+      netContributionsDID.toString(),
+      web3.toWei(10000, 'ether'),
+      ''
+    )
   })
 })

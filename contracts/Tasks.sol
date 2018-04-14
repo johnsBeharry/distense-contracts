@@ -3,8 +3,9 @@ pragma solidity ^0.4.21;
 import './DIDToken.sol';
 import './Distense.sol';
 import './lib/SafeMath.sol';
+import './Debuggable.sol';
 
-contract Tasks is Approvable {
+contract Tasks is Approvable, Debuggable {
 
     using SafeMath for uint256;
 
@@ -89,7 +90,7 @@ contract Tasks is Approvable {
     function taskRewardVote(bytes32 _taskId, uint256 _reward) external returns (bool) {
 
         DIDToken didToken = DIDToken(DIDTokenAddress);
-        uint256 balance = didToken.getAddressBalance(msg.sender);
+        uint256 balance = didToken.getNetNumContributionsDID(msg.sender);
         Distense distense = Distense(DistenseAddress);
 
         Task storage task = tasks[_taskId];
@@ -97,7 +98,7 @@ contract Tasks is Approvable {
         require(_reward >= 0);
 
         //  Essentially refund the remaining gas if user's vote will have no effect
-        require(task.reward != (_reward * FLOAT_CONSTANT));
+        require(task.reward != (_reward * 1 ether));
 
         // Don't let the voter vote if the reward has already been determined
         require(task.rewardStatus != RewardStatus.DETERMINED);
@@ -107,15 +108,17 @@ contract Tasks is Approvable {
 
         //  Does the voter own at least as many DID as the reward their voting for?
         //  This ensures new contributors don't have too much sway over the issuance of new DID.
-        require(balance > SafeMath.div(distense.getParameterValueByTitle(distense.numDIDRequiredToTaskRewardVoteParameterTitle()), 1000000000));
+        require(balance > distense.getParameterValueByTitle(distense.numDIDRequiredToTaskRewardVoteParameterTitle()));
 
         //  Require the reward to be less than or equal to the maximum reward parameter,
         //  which basically is a hard, floating limit on the number of DID that can be issued for any single task
-        require(_reward <= SafeMath.div(distense.getParameterValueByTitle(distense.maxRewardParameterTitle()), 1000000000));
+        require((_reward * 1 ether) <= distense.getParameterValueByTitle(distense.maxRewardParameterTitle()));
 
         task.rewardVotes[msg.sender] = true;
 
         uint256 pctDIDOwned = didToken.pctDIDOwned(msg.sender);
+        LogString('pctDIDOwned');
+        LogUInt256(pctDIDOwned);
         task.pctDIDVoted = task.pctDIDVoted + pctDIDOwned;
 
         //  Get the current votingPowerLimit
@@ -126,16 +129,19 @@ contract Tasks is Approvable {
         uint256 difference;
         uint256 update;
 
-    if ((_reward * FLOAT_CONSTANT) > task.reward) {
-            difference = SafeMath.sub((_reward * FLOAT_CONSTANT), task.reward);
-            update = (limitedVotingPower * difference) / 100000000000;
+        if ((_reward * 1 ether) > task.reward) {
+            difference = SafeMath.sub((_reward * 1 ether), task.reward);
+            update = (limitedVotingPower * difference) / (1 ether * 100);
             task.reward += update;
         } else {
-            difference = SafeMath.sub(task.reward, (_reward * FLOAT_CONSTANT));
-            update = (limitedVotingPower * difference) / 100000000000;
+            difference = SafeMath.sub(task.reward, (_reward * 1 ether));
+            update = (limitedVotingPower * difference) / (1 ether * 100);
             task.reward -= update;
         }
-
+        LogString('update');
+        LogUInt256(update);
+        LogString('difference');
+        LogUInt256(difference);
         task.numVotes++;
 
         uint256 pctDIDVotedThreshold = distense.getParameterValueByTitle(
@@ -146,7 +152,7 @@ contract Tasks is Approvable {
             distense.minNumberOfTaskRewardVotersParameterTitle()
         );
 
-        if (task.pctDIDVoted > pctDIDVotedThreshold || task.numVotes > SafeMath.div(minNumVoters, 1000000000)) {
+        if (task.pctDIDVoted > pctDIDVotedThreshold || task.numVotes > SafeMath.div(minNumVoters, 1 ether)) {
             emit LogTaskRewardDetermined(_taskId, task.reward);
             task.rewardStatus = RewardStatus.DETERMINED;
         }
@@ -197,13 +203,13 @@ contract Tasks is Approvable {
 
     modifier hasEnoughDIDToAddTask() {
         DIDToken didToken = DIDToken(DIDTokenAddress);
-        uint256 balance = didToken.getAddressBalance(msg.sender);
+        uint256 balance = didToken.getNetNumContributionsDID(msg.sender);
 
         Distense distense = Distense(DistenseAddress);
         uint256 numDIDRequiredToAddTask = distense.getParameterValueByTitle(
             distense.numDIDRequiredToAddTaskParameterTitle()
         );
-        require(balance >= SafeMath.div(numDIDRequiredToAddTask, 1000000000));
+        require(balance >= numDIDRequiredToAddTask);
         _;
     }
 

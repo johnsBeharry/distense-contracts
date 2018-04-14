@@ -21,7 +21,7 @@ contract DIDToken is Approvable, Debuggable {
 
     uint256 public investmentLimitAggregate  = 10000 ether;  // This is the max DID all addresses can receive from depositing ether
     uint256 public investmentLimitAddress = 100 ether;  // This is the max DID any address can receive from Ether deposit
-    uint256 public investedAggregate = 0 ether;
+    uint256 public investedAggregate = 1 ether;
 
     string public name;
     string public symbol;
@@ -48,7 +48,9 @@ contract DIDToken is Approvable, Debuggable {
         require(_recipient != address(0));
         require(_numDID > 0);
 
+        _numDID = _numDID * 1 ether;
         totalSupply = SafeMath.add(totalSupply, _numDID);
+        
         uint256 balance = DIDHolders[_recipient].balance;
         DIDHolders[_recipient].balance = SafeMath.add(balance, _numDID);
 
@@ -63,11 +65,13 @@ contract DIDToken is Approvable, Debuggable {
     function decrementDID(address _address, uint256 _numDID) external onlyApproved returns (uint256) {
         require(_address != address(0));
         require(_numDID > 0);
-        require(SafeMath.sub(DIDHolders[_address].balance, _numDID) >= 0);
-        require(SafeMath.sub(totalSupply, _numDID) >= 0);
+        uint256 numDID = _numDID * 1 ether;
+        require(SafeMath.sub(DIDHolders[_address].balance, numDID) >= 0);
+        require(SafeMath.sub(totalSupply, numDID ) >= 0);
 
-        totalSupply = SafeMath.sub(totalSupply, _numDID);
-        DIDHolders[_address].balance = SafeMath.sub(DIDHolders[_address].balance, _numDID);
+        totalSupply = SafeMath.sub(totalSupply, numDID);
+        DIDHolders[_address].balance = SafeMath.sub(DIDHolders[_address].balance, numDID);
+
         //  If DIDHolder has exchanged all of their DID remove from DIDHoldersArray
         if (DIDHolders[_address].balance == 0) {
             if (DIDHoldersArray.length > 1) {
@@ -78,13 +82,13 @@ contract DIDToken is Approvable, Debuggable {
             }
         }
 
-        emit LogDecrementDID(_address, _numDID);
+        emit LogDecrementDID(_address, numDID);
 
         return DIDHolders[_address].balance;
     }
 
     function pctDIDOwned(address _address) external view returns (uint256) {
-        return SafeMath.percent(DIDHolders[_address].balance, totalSupply, 11);
+        return SafeMath.percent(DIDHolders[_address].netContributionsDID, totalSupply, 20);
     }
 
     function exchangeDIDForEther(uint256 _numDIDToExchange)
@@ -97,12 +101,14 @@ contract DIDToken is Approvable, Debuggable {
 
         uint256 numEtherToIssue = SafeMath.div(_numDIDToExchange, DIDPerEther);
 
+        uint256 numDIDToExchange = _numDIDToExchange * 1 ether;
+
         address contractAddress = this;
         require(contractAddress.balance > numEtherToIssue);
 
         //  Adjust number of DID owned first
-        DIDHolders[msg.sender].balance = SafeMath.sub(DIDHolders[msg.sender].balance, _numDIDToExchange);
-        totalSupply = SafeMath.sub(totalSupply, _numDIDToExchange);
+        DIDHolders[msg.sender].balance = SafeMath.sub(DIDHolders[msg.sender].balance, numDIDToExchange);
+        totalSupply = SafeMath.sub(totalSupply, numDIDToExchange);
 
         msg.sender.transfer(numEtherToIssue);
 
@@ -114,7 +120,7 @@ contract DIDToken is Approvable, Debuggable {
                 delete DIDHolders[msg.sender];
             }
         }
-        emit LogExchangeDIDForEther(msg.sender, _numDIDToExchange);
+        emit LogExchangeDIDForEther(msg.sender, numDIDToExchange);
 
         return DIDHolders[msg.sender].balance;
     }
@@ -122,21 +128,19 @@ contract DIDToken is Approvable, Debuggable {
     function investEtherForDID() canDepositThisManyEtherForDID external payable returns (uint256) {
 
         Distense distense = Distense(DistenseAddress);
-        uint256 DIDPerEther = SafeMath.div(distense.getParameterValueByTitle(distense.didPerEtherParameterTitle()), 1000000000);
+        uint256 DIDPerEther = SafeMath.div(distense.getParameterValueByTitle(distense.didPerEtherParameterTitle()), 1 ether);
 
-        // require ether investment to be worth at least 1 DID
-        require(investedOneDIDWorth(msg.value, DIDPerEther));
         require(getNumWeiAddressMayInvest(msg.sender) >= msg.value);
 
         uint256 numDIDToIssue = calculateNumDIDToIssue(msg.value, DIDPerEther);
-//        require(DIDHolders[msg.sender].netContributionsDID >= numDIDToIssue);
+        require(DIDHolders[msg.sender].netContributionsDID >= numDIDToIssue);
 
         totalSupply = SafeMath.add(totalSupply, numDIDToIssue);
         DIDHolders[msg.sender].balance = SafeMath.add(DIDHolders[msg.sender].balance, numDIDToIssue);
         decrementDIDFromContributions(msg.sender, numDIDToIssue);
 
         DIDHolders[msg.sender].weiInvested += msg.value;
-        investedAggregate += msg.value;
+        investedAggregate = investedAggregate + msg.value;
 
         emit LogIssueDID(msg.sender, numDIDToIssue);
         emit LogInvestEtherForDID(msg.sender, msg.value);
@@ -158,9 +162,8 @@ contract DIDToken is Approvable, Debuggable {
 
         Distense distense = Distense(DistenseAddress);
         uint256 DIDPerEther = distense.getParameterValueByTitle(distense.didPerEtherParameterTitle());
-        require(SafeMath.div((DIDFromContributions * DIDPerEther), DIDPerEther) >= DIDFromContributions);
 
-        return DIDFromContributions * DIDPerEther * 1000;
+        return (DIDFromContributions * 1 ether) / DIDPerEther;
     }
 
     function rewardContributor(address _contributor, uint256 _reward) external returns (bool) {
@@ -194,21 +197,17 @@ contract DIDToken is Approvable, Debuggable {
     }
 
     function calculateNumDIDToIssue(uint256 msgValue, uint256 DIDPerEther) public pure returns (uint256) {
-        uint256 numDIDToIssueNum = SafeMath.mul(msgValue, DIDPerEther);
-        return SafeMath.div(numDIDToIssueNum, 1 ether);
-    }
-
-    function investedOneDIDWorth(uint256 msgValue, uint256 DIDPerEther) public pure returns (bool) {
-        require(msgValue > SafeMath.div(1 ether, DIDPerEther));
-        return true;
+        return SafeMath.mul(msgValue, DIDPerEther);
     }
 
     function incrementDIDFromContributions(address _contributor, uint256 _reward) public {
-        DIDHolders[_contributor].netContributionsDID += _reward;
+        uint256 incrementReward = _reward * 1 ether;
+        DIDHolders[_contributor].netContributionsDID += incrementReward;
+        totalSupply += incrementReward;
     }
 
     function decrementDIDFromContributions(address _contributor, uint256 _num) public {
-        DIDHolders[_contributor].netContributionsDID -= _num;
+        DIDHolders[_contributor].netContributionsDID -= _num * 1 ether;
     }
 
     modifier hasEnoughDID(address _address, uint256 _num) {

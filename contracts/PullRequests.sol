@@ -3,9 +3,10 @@ pragma solidity ^0.4.21;
 import './lib/Approvable.sol';
 import './DIDToken.sol';
 import './Distense.sol';
+import './Debuggable.sol';
 import './Tasks.sol';
 
-contract PullRequests is Approvable {
+contract PullRequests is Approvable, Debuggable {
 
     address public DIDTokenAddress;
     address public DistenseAddress;
@@ -116,7 +117,7 @@ contract PullRequests is Approvable {
 
         DIDToken didToken = DIDToken(DIDTokenAddress);
 
-        require(didToken.getAddressBalance(msg.sender) > SafeMath.div(threshold, 1000000000));
+        require(didToken.getNetNumContributionsDID(msg.sender) > threshold);
         _;
     }
 
