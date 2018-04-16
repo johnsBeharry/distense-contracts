@@ -387,9 +387,14 @@ contract('PullRequests', function(accounts) {
     assert.equal(eventArgs.taskId, pullRequest.taskId)
   })
 
+  //  reviewed 4-14-2018 JJA
   it("should increment a contributor's Contributions DID correctly after a pull request reaches the required approvals", async function() {
+    const origNumDIDFromContributions = 10000
     await didToken.issueDID(accounts[0], 1000000)
-    await didToken.incrementDIDFromContributions(accounts[0], 1000000)
+    await didToken.incrementDIDFromContributions(
+      accounts[0],
+      origNumDIDFromContributions
+    )
 
     await tasks.addTask(pullRequest.taskId, 'some title')
     const taskExists = await tasks.taskExists.call(pullRequest.taskId)
@@ -435,7 +440,7 @@ contract('PullRequests', function(accounts) {
     const DID = await didToken.getAddressBalance.call(accounts[0])
 
     assert.isAbove(DID, 1000000)
-    assert.isAbove(contributionsDID, 1000000)
+    assert.isAbove(contributionsDID, origNumDIDFromContributions)
   })
 
   it('should set the prNum correctly when adding pullRequests', async function() {
