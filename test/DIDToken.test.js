@@ -254,10 +254,11 @@ contract('DIDToken', function(accounts) {
     )
   })
 
+  //  reviewed 4-14-2018 JJA
   it('should decrement the balance of DID of the DID exchanger', async function() {
     //  make sure the contract has ether to return for the DID or this will fail
-    await didToken.issueDID(accounts[1], 2000000)
-    await didToken.incrementDIDFromContributions(accounts[1], 2000000)
+    await didToken.issueDID(accounts[1], 2000)
+    await didToken.incrementDIDFromContributions(accounts[1], 2000)
 
     await didToken.investEtherForDID({
       from: accounts[1],
@@ -265,30 +266,21 @@ contract('DIDToken', function(accounts) {
     })
 
     const numDIDToExchange = 123
-    let beginBalance = await didToken.getAddressBalance.call(accounts[1])
-
-    assert.isAbove(
-      beginBalance.toString(),
-      numDIDToExchange,
-      'accounts[1] must own 100 DID for this test to properly fail'
-    )
 
     await didToken.exchangeDIDForEther(numDIDToExchange, {
       from: accounts[1]
     })
 
     const updatedBalance = await didToken.getAddressBalance.call(accounts[1])
-    assert.equal(
-      updatedBalance.toString(),
-      2.001877e24,
-      'All of the original DID received should have been exchanged'
-    )
+
+    assert.equal(updatedBalance.toString(), 3.877e21) // 3877
   })
 
+  //  reviewed 4-14-2018 JJA
   it('should increment the investedAddress of an address', async function() {
     //  make sure the contract has ether to return for the DID or this will fail
     await didToken.issueDID(accounts[1], 2000000)
-    await didToken.incrementDIDFromContributions(accounts[1], 2000000000)
+    await didToken.incrementDIDFromContributions(accounts[1], 2000000)
 
     await didToken.investEtherForDID({
       from: accounts[1],
@@ -317,6 +309,7 @@ contract('DIDToken', function(accounts) {
     )
   })
 
+  //  reviewed 4-14-2018 JJA
   it('should increment investedAggregate', async function() {
     //  make sure the contract has ether to return for the DID or this will fail
     await didToken.issueDID(accounts[1], 1000000)
@@ -332,18 +325,17 @@ contract('DIDToken', function(accounts) {
 
     let investedAggregate = await didToken.investedAggregate.call()
 
-    assert.isAbove(
-      investedAggregate,
-      web3.toWei(0),
+    assert.equal(
+      investedAggregate.toString(),
+      web3.toWei(3),
       'investedAggregate should be higher by 2 ether'
     )
   })
 
+  //  reviewed 4-14-2018 JJA
   it('remainingWeiAggregateMayInvest should return correct values', async function() {
     //  make sure the contract has ether to return for the DID or this will fail
     await didToken.incrementDIDFromContributions(accounts[1], 10000)
-
-    const aggregateWeiCanInvest = await didToken.investmentLimitAggregate.call()
 
     await didToken.investEtherForDID(
       {},
@@ -354,27 +346,24 @@ contract('DIDToken', function(accounts) {
     )
 
     const remainingWei = await didToken.getWeiAggregateMayInvest.call()
-    assert.equal(
-      remainingWei.toString(),
-      9.998e21,
-      'should have reduced remainingWeiAggregateMayInvest by amount of wei invested'
-    )
-    // assert.equal(true, false)
+    assert.equal(remainingWei.toString(), 9.998e21) // 9998
   })
 
+  //  reviewed 4-14-2018 JJA
   it('numWeiAddressMayInvest should prevent those with 0 DID from contributions from contributing', async function() {
     //  make sure the contract has ether to return for the DID or this will fail
     await didToken.issueDID(accounts[0], 1000000) // DID but no DID from contributions
     let someError
 
     try {
-      await didToken.getNumWeiAddressMayInvest(accounts[0])
+      await didToken.getNumWeiAddressMayInvest(accounts[0]) // throws
     } catch (error) {
       someError = error
     }
     assert.notEqual(someError, undefined)
   })
 
+  //  reviewed 4-16-2018 JJA
   it('numWeiAddressMayInvest should allow those who have DID from contributions to invest', async function() {
     //  make sure the contract has ether to return for the DID or this will fail
     await didToken.incrementDIDFromContributions(accounts[0], 10000)

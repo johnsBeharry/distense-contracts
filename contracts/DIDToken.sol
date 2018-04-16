@@ -148,6 +148,16 @@ contract DIDToken is Approvable, Debuggable {
         return DIDHolders[msg.sender].balance;
     }
 
+    function incrementDIDFromContributions(address _contributor, uint256 _reward) public {
+        uint256 incrementReward = _reward * 1 ether;
+        DIDHolders[_contributor].netContributionsDID += incrementReward;
+        totalSupply += incrementReward;
+    }
+
+    function decrementDIDFromContributions(address _contributor, uint256 _num) public {
+        DIDHolders[_contributor].netContributionsDID -= _num * 1 ether;
+    }
+
     function incrementTasksCompleted(address _contributor) onlyApproved public returns (bool) {
         DIDHolders[_contributor].tasksCompleted++;
         return true;
@@ -198,16 +208,6 @@ contract DIDToken is Approvable, Debuggable {
 
     function calculateNumDIDToIssue(uint256 msgValue, uint256 DIDPerEther) public pure returns (uint256) {
         return SafeMath.mul(msgValue, DIDPerEther);
-    }
-
-    function incrementDIDFromContributions(address _contributor, uint256 _reward) public {
-        uint256 incrementReward = _reward * 1 ether;
-        DIDHolders[_contributor].netContributionsDID += incrementReward;
-        totalSupply += incrementReward;
-    }
-
-    function decrementDIDFromContributions(address _contributor, uint256 _num) public {
-        DIDHolders[_contributor].netContributionsDID -= _num * 1 ether;
     }
 
     modifier hasEnoughDID(address _address, uint256 _num) {
