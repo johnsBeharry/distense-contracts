@@ -204,15 +204,16 @@ contract Distense is Approvable, Debuggable {
         returns
     (uint256) {
 
-        require(_voteValue <= 100);
+        require(_voteValue <= 100 * 1 ether);
 
         DIDToken didToken = DIDToken(DIDTokenAddress);
         uint256 votersDIDPercent = didToken.pctDIDOwned(msg.sender);
         require(votersDIDPercent > 0);
 
         uint256 currentValue = getParameterValueByTitle(_title);
-//          For voting power purposes, limit the pctDIDOwned to the maximum of the Voting Power Limit parameter or the voter's percentage ownership
-//          of DID
+
+        //  For voting power purposes, limit the pctDIDOwned to the maximum of the Voting Power Limit parameter or the voter's percentage ownership
+        //  of DID
         uint256 votingPowerLimit = getParameterValueByTitle(votingPowerLimitParameterTitle);
 
         uint256 limitedVotingPower = votersDIDPercent > votingPowerLimit ? votingPowerLimit : votersDIDPercent;
@@ -221,14 +222,14 @@ contract Distense is Approvable, Debuggable {
         if (
             _voteValue == 1 ||  // maximum upvote
             _voteValue == - 1 || // minimum downvote
-            _voteValue * 1 ether > int(limitedVotingPower) ||
-            _voteValue * - 1 ether > int(limitedVotingPower)
+            _voteValue > int(limitedVotingPower) || // vote value greater than votingPowerLimit
+            _voteValue < - int(limitedVotingPower)  // vote value greater than votingPowerLimit absolute value
         ) {
             update = (limitedVotingPower * currentValue) / (100 * 1 ether);
         } else if (_voteValue > 0) {
-            update = (uint(_voteValue) * currentValue) / 100;
+            update = SafeMath.div((uint(_voteValue) * currentValue), (1 ether * 100));
         } else if (_voteValue < 0) {
-            int256 adjustedVoteValue = (-_voteValue) * 1 ether; // make the voteValue positive and convert to on-chain decimals
+            int256 adjustedVoteValue = (-_voteValue); // make the voteValue positive and convert to on-chain decimals
             update = uint((adjustedVoteValue * int(currentValue))) / (100 * 1 ether);
         } else revert(); //  If _voteValue is 0 refund gas to voter
 

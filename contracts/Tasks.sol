@@ -117,8 +117,7 @@ contract Tasks is Approvable, Debuggable {
         task.rewardVotes[msg.sender] = true;
 
         uint256 pctDIDOwned = didToken.pctDIDOwned(msg.sender);
-        LogString('pctDIDOwned');
-        LogUInt256(pctDIDOwned);
+
         task.pctDIDVoted = task.pctDIDVoted + pctDIDOwned;
 
         //  Get the current votingPowerLimit
@@ -138,10 +137,7 @@ contract Tasks is Approvable, Debuggable {
             update = (limitedVotingPower * difference) / (1 ether * 100);
             task.reward -= update;
         }
-        LogString('update');
-        LogUInt256(update);
-        LogString('difference');
-        LogUInt256(difference);
+
         task.numVotes++;
 
         uint256 pctDIDVotedThreshold = distense.getParameterValueByTitle(

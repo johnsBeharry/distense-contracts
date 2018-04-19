@@ -239,7 +239,7 @@ contract('Tasks', function(accounts) {
     let addError
     try {
       //contract throws error here
-      await tasks.addTask('')
+      await tasks.addTask('', task.title)
     } catch (error) {
       addError = error
     }
@@ -247,6 +247,28 @@ contract('Tasks', function(accounts) {
       addError,
       undefined,
       'Error should be thrown when inserting empty bytes32'
+    )
+
+    const numTasks = await tasks.getNumTasks.call()
+    assert.equal(
+      numTasks,
+      0,
+      'No task should be added when empty string passed'
+    )
+  })
+
+  it('should not add tasks with empty title', async function() {
+    let addError
+    try {
+      //contract throws error here
+      await tasks.addTask(task.taskId, '')
+    } catch (error) {
+      addError = error
+    }
+    assert.notEqual(
+      addError,
+      undefined,
+      'Error should be thrown when inserting task with empty title  '
     )
 
     const numTasks = await tasks.getNumTasks.call()

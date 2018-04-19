@@ -2,8 +2,11 @@ const web3 = global.web3
 const DIDToken = artifacts.require('DIDToken')
 const Distense = artifacts.require('Distense')
 const utils = require('./helpers/utils')
+const BigNumber = require('bignumber.js')
 
 import { convertSolidityIntToInt } from './helpers/utils'
+
+const oneEtherEquivalentWei = web3.toWei(1, 'ether')
 
 contract('Distense contract', function(accounts) {
   const pctDIDToDetermineTaskRewardParameter = {
@@ -385,7 +388,8 @@ contract('Distense contract', function(accounts) {
     await didToken.incrementDIDFromContributions(accounts[0], 20000)
     await didToken.incrementDIDFromContributions(accounts[1], 20000)
 
-    await distense.voteOnParameter(votingIntervalParameter.title, 40)
+    const voteValue = new BigNumber(40).times(oneEtherEquivalentWei)
+    await distense.voteOnParameter(votingIntervalParameter.title, voteValue)
 
     const newValue = await distense.getParameterValueByTitle.call(
       votingIntervalParameter.title
@@ -402,7 +406,8 @@ contract('Distense contract', function(accounts) {
     await didToken.incrementDIDFromContributions(accounts[0], 20000)
     await didToken.incrementDIDFromContributions(accounts[1], 20000)
 
-    await distense.voteOnParameter(votingIntervalParameter.title, 5)
+    const voteValue = new BigNumber(5).times(oneEtherEquivalentWei)
+    await distense.voteOnParameter(votingIntervalParameter.title, voteValue)
 
     const newValue = await distense.getParameterValueByTitle.call(
       votingIntervalParameter.title
@@ -419,7 +424,8 @@ contract('Distense contract', function(accounts) {
     await didToken.incrementDIDFromContributions(accounts[0], 20000)
     await didToken.incrementDIDFromContributions(accounts[1], 20000)
 
-    await distense.voteOnParameter(votingIntervalParameter.title, -40)
+    const voteValue = new BigNumber(-40).times(oneEtherEquivalentWei)
+    await distense.voteOnParameter(votingIntervalParameter.title, voteValue)
 
     const newValue = await distense.getParameterValueByTitle.call(
       votingIntervalParameter.title
@@ -436,7 +442,9 @@ contract('Distense contract', function(accounts) {
     await didToken.incrementDIDFromContributions(accounts[0], 20000)
     await didToken.incrementDIDFromContributions(accounts[1], 20000)
 
-    await distense.voteOnParameter(votingIntervalParameter.title, -5)
+    const voteValue = new BigNumber(-5).times(oneEtherEquivalentWei)
+    console.log(`voteValue: ${voteValue}`)
+    await distense.voteOnParameter(votingIntervalParameter.title, voteValue)
 
     const newValue = await distense.getParameterValueByTitle.call(
       votingIntervalParameter.title
@@ -453,10 +461,11 @@ contract('Distense contract', function(accounts) {
     await didToken.incrementDIDFromContributions(accounts[0], 1000)
     await didToken.incrementDIDFromContributions(accounts[1], 20000)
 
+    const voteValue = new BigNumber(-21).times(oneEtherEquivalentWei)
     //  accounts[0] owns 3000 of 23000 total DID -- 13% here
     await distense.voteOnParameter(
       numDIDRequiredToTaskRewardVoteParameter.title,
-      -21
+      voteValue
     )
 
     const newValue = await distense.getParameterValueByTitle.call(
@@ -476,8 +485,10 @@ contract('Distense contract', function(accounts) {
     await didToken.incrementDIDFromContributions(accounts[1], 20000)
 
     let someError
+    const voteValue = new BigNumber(101).times(oneEtherEquivalentWei)
+
     try {
-      await distense.voteOnParameter(votingIntervalParameter.title, 101)
+      await distense.voteOnParameter(votingIntervalParameter.title, voteValue)
     } catch (e) {
       someError = e
       console.log(`${someError}`)
