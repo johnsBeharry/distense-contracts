@@ -3,6 +3,7 @@ const DIDToken = artifacts.require('DIDToken')
 const Distense = artifacts.require('./Distense.sol')
 const web3Utils = require('web3-utils')
 const didPerEtherParameter = require('./Distense.test')
+const BigNumber = require('bignumber.js')
 
 const increaseTime = addSeconds => {
   web3.currentProvider.send({
@@ -92,15 +93,15 @@ contract('DIDToken', function(accounts) {
 
   it('should correctly calculate the percentDID someone owns', async function() {
     assert.equal(await didToken.totalSupply(), 0)
-    await didToken.incrementDIDFromContributions(accounts[0], 200)
+    await didToken.issueDID(accounts[0], 200)
     let percentDID = await didToken.pctDIDOwned(accounts[0])
     assert.equal(percentDID.toString(), 100000000000000000000)
 
-    await didToken.incrementDIDFromContributions(accounts[1], 100)
+    await didToken.issueDID(accounts[1], 100)
     percentDID = await didToken.pctDIDOwned(accounts[1])
     assert.equal(percentDID.toString(), 33333333333333333333)
 
-    await didToken.incrementDIDFromContributions(accounts[1], 100)
+    await didToken.issueDID(accounts[1], 100)
     percentDID = await didToken.pctDIDOwned(accounts[1])
     assert.equal(percentDID.toString(), 50000000000000000000)
   })
@@ -254,18 +255,17 @@ contract('DIDToken', function(accounts) {
     )
   })
 
-  //  reviewed 4-14-2018 JJA
   it('should decrement the balance of DID of the DID exchanger', async function() {
     //  make sure the contract has ether to return for the DID or this will fail
-    await didToken.issueDID(accounts[1], 2000)
-    await didToken.incrementDIDFromContributions(accounts[1], 2000)
+    // await didToken.issueDID(accounts[1], 2000)
+    await didToken.incrementDIDFromContributions(accounts[1], 10000)
 
     await didToken.investEtherForDID({
       from: accounts[1],
-      value: web3.toWei(2)
+      value: web3.toWei(4)
     })
 
-    const numDIDToExchange = 123
+    const numDIDToExchange = 1
 
     await didToken.exchangeDIDForEther(numDIDToExchange, {
       from: accounts[1]
@@ -273,7 +273,7 @@ contract('DIDToken', function(accounts) {
 
     const updatedBalance = await didToken.getAddressBalance.call(accounts[1])
 
-    assert.equal(updatedBalance.toString(), 3.877e21) // 3877
+    assert.equal(updatedBalance.toString(), 3.999e21)
   })
 
   //  reviewed 4-14-2018 JJA
@@ -448,6 +448,7 @@ contract('DIDToken', function(accounts) {
     //  make sure the contract has ether to return for the DID or this will fail
     await didToken.issueDID(accounts[5], 101)
     await didToken.issueDID(accounts[4], 100)
+    await didToken.incrementDIDFromContributions(accounts[4], 100)
     await didToken.issueDID(accounts[3], 102)
     await didToken.issueDID(accounts[0], 102)
     await didToken.incrementDIDFromContributions(accounts[0], 20000)
@@ -554,7 +555,7 @@ contract('DIDToken', function(accounts) {
     assert.equal(DID.toString(), 3.66663e21)
   })
 
-  it('investEtherForDID should decrement the ContributionsDID of an address', async function() {
+  it('investEtherForDID should decrement the DID balances of an address', async function() {
     //  make sure the contract has ether to return for the DID or this will fail
     await didToken.issueDID(accounts[1], 10000)
     await didToken.incrementDIDFromContributions(accounts[1], 10000)
@@ -564,13 +565,69 @@ contract('DIDToken', function(accounts) {
       value: web3.toWei(3)
     })
 
-    const netContributionsDID = await didToken.getNetNumContributionsDID.call(
-      accounts[1]
+    const didBalance = await didToken.getAddressBalance.call(accounts[1])
+    assert.isBelow(didBalance.toString(), web3.toWei(10000, 'ether'), '')
+  })
+
+  it('calculateNumWeiToIssue should perform correctly', async function() {
+    let WEI = await didToken.calculateNumWeiToIssue.call(
+      web3.toWei(1, 'ether'),
+      web3.toWei(1000, 'ether')
     )
-    assert.isBelow(
-      netContributionsDID.toString(),
-      web3.toWei(10000, 'ether'),
-      ''
+    assert.equal(WEI.toString(), web3.toWei(1, 'finney'))
+
+    WEI = await didToken.calculateNumWeiToIssue.call(
+      web3.toWei(12100),
+      web3.toWei(1100)
     )
+    assert.equal(WEI.toString(), web3.toWei(11, 'ether'))
+
+    WEI = await didToken.calculateNumWeiToIssue.call(
+      web3.toWei(33333),
+      web3.toWei(1100)
+    )
+    assert.equal(WEI.toString(), 30302727272727272727)
+
+    WEI = await didToken.calculateNumWeiToIssue.call(
+      web3.toWei(333),
+      web3.toWei(454)
+    )
+    assert.equal(WEI.toString(), 733480176211453744)
+  })
+
+  it('should send ether to someone who exchanges DID', async function() {
+    //  make sure the contract has ether to return for the DID or this will fail
+    await didToken.approve(accounts[0])
+    await didToken.issueDID(accounts[0], 10000)
+    await didToken.issueDID(accounts[1], 10000)
+    await didToken.incrementDIDFromContributions(accounts[1], 10000)
+    await didToken.incrementDIDFromContributions(accounts[0], 12000)
+    const numContributionsDID = await didToken.getNetNumContributionsDID.call(
+      accounts[0]
+    )
+
+    const originalBalance = await web3.eth.getBalance(accounts[0])
+    await didToken.investEtherForDID({
+      from: accounts[1],
+      value: web3.toWei(5, 'ether')
+    })
+
+    const numDIDToExchange = 100
+
+    let etherBalance = await web3.eth.getBalance(accounts[1])
+    await didToken.exchangeDIDForEther(numDIDToExchange)
+
+    etherBalance = await web3.eth.getBalance(accounts[1])
+    const didPerEtherParameterValue = await distense.getParameterValueByTitle.call(
+      'didPerEther'
+    )
+    const numWeiThatShouldBeIssued = await didToken.calculateNumWeiToIssue.call(
+      web3.toWei(numDIDToExchange),
+      didPerEtherParameterValue
+    )
+    const endingBalance = new BigNumber(
+      numWeiThatShouldBeIssued.toString()
+    ).add(etherBalance)
+    assert.isAbove(endingBalance.toString(), etherBalance.toString())
   })
 })

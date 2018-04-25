@@ -223,6 +223,9 @@ contract('PullRequests', function(accounts) {
   })
 
   it('approvePullRequest() should increment the pctDIDApproved correctly', async function() {
+    await didToken.issueDID(accounts[0], 1200000)
+    await didToken.issueDID(accounts[1], 1200000)
+    await didToken.issueDID(accounts[2], 1200000)
     await didToken.incrementDIDFromContributions(accounts[0], 1200000)
     await didToken.incrementDIDFromContributions(accounts[1], 1200000)
     await didToken.incrementDIDFromContributions(accounts[2], 1200000)
@@ -286,6 +289,8 @@ contract('PullRequests', function(accounts) {
   })
 
   it('should fire event "LogPullRequestApprovalVote" when approvePullRequest is appropriately called', async function() {
+    await didToken.issueDID(accounts[5], 1200000)
+    await didToken.issueDID(accounts[0], 1200000)
     await didToken.incrementDIDFromContributions(accounts[5], 1200000)
     await didToken.incrementDIDFromContributions(accounts[0], 1200000)
 
@@ -339,9 +344,13 @@ contract('PullRequests', function(accounts) {
   })
 
   it('should fire event "LogRewardPullRequest" when addPullRequest is appropriately called', async function() {
+    await didToken.issueDID(accounts[5], 1200000)
+    await didToken.issueDID(accounts[4], 1200000)
+    await didToken.issueDID(accounts[0], 1200000)
     await didToken.incrementDIDFromContributions(accounts[5], 1200000)
     await didToken.incrementDIDFromContributions(accounts[4], 1200000)
     await didToken.incrementDIDFromContributions(accounts[0], 1200000)
+
     await tasks.addTask(pullRequest.taskId, 'some amazing title')
 
     await pullRequests.addPullRequest(

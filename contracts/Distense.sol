@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.23;
 
 import './lib/Approvable.sol';
 import './DIDToken.sol';
@@ -67,7 +67,7 @@ contract Distense is Approvable, Debuggable {
 
     event LogParameterValueUpdate(bytes32 title, uint256 value);
 
-    function Distense(address _DIDTokenAddress) public {
+    constructor (address _DIDTokenAddress) public {
 
         DIDTokenAddress = _DIDTokenAddress;
 

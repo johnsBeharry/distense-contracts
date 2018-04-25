@@ -1,4 +1,5 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.23;
+
 
 import './DIDToken.sol';
 import './Distense.sol';
@@ -35,7 +36,7 @@ contract Tasks is Approvable, Debuggable {
 
     uint256 FLOAT_CONSTANT = 1000000000;
 
-    function Tasks(address _DIDTokenAddress, address _DistenseAddress) public {
+    constructor(address _DIDTokenAddress, address _DistenseAddress) public {
         DIDTokenAddress = _DIDTokenAddress;
         DistenseAddress = _DistenseAddress;
     }
@@ -117,7 +118,6 @@ contract Tasks is Approvable, Debuggable {
         task.rewardVotes[msg.sender] = true;
 
         uint256 pctDIDOwned = didToken.pctDIDOwned(msg.sender);
-
         task.pctDIDVoted = task.pctDIDVoted + pctDIDOwned;
 
         //  Get the current votingPowerLimit

@@ -278,6 +278,7 @@ contract('Distense contract', function(accounts) {
   beforeEach(async function() {
     didToken = await DIDToken.new()
     didToken.incrementDIDFromContributions(accounts[0], 2000)
+    didToken.issueDID(accounts[0], 2000)
     distense = await Distense.new(didToken.address)
   })
 
@@ -443,7 +444,6 @@ contract('Distense contract', function(accounts) {
     await didToken.incrementDIDFromContributions(accounts[1], 20000)
 
     const voteValue = new BigNumber(-5).times(oneEtherEquivalentWei)
-    console.log(`voteValue: ${voteValue}`)
     await distense.voteOnParameter(votingIntervalParameter.title, voteValue)
 
     const newValue = await distense.getParameterValueByTitle.call(
@@ -475,7 +475,7 @@ contract('Distense contract', function(accounts) {
     //  accounts[0] owns 3000 of 23000 total DID -- 13% here
     assert.equal(
       newValue.toNumber(),
-      86956521739130440000,
+      80000000000000000000,
       'updated value should be 13% lower'
     )
   })
@@ -565,6 +565,8 @@ contract('Distense contract', function(accounts) {
   })
 
   it(`should properly update the pctDIDToDetermineTaskRewardParameter value`, async function() {
+    await didToken.issueDID(accounts[1], 2000)
+    await didToken.issueDID(accounts[2], 2000)
     await didToken.incrementDIDFromContributions(accounts[1], 2000)
     await didToken.incrementDIDFromContributions(accounts[2], 2000)
 

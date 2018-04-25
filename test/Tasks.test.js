@@ -92,7 +92,9 @@ contract('Tasks', function(accounts) {
   })
 
   it('should return true or otherwise modify the task with taskRewardVote() when the voter hasDID', async function() {
+    await didToken.issueDID(accounts[0], 100000)
     await didToken.incrementDIDFromContributions(accounts[0], 100000)
+    await didToken.issueDID(accounts[1], 100000)
     await didToken.incrementDIDFromContributions(accounts[1], 100000)
 
     await tasks.addTask(task.taskId, task.title)
@@ -300,7 +302,9 @@ contract('Tasks', function(accounts) {
 
   it('should increase the pctDIDVoted on a task correctly', async function() {
     await didToken.incrementDIDFromContributions(accounts[0], 90000)
+    await didToken.issueDID(accounts[0], 90000)
     await didToken.incrementDIDFromContributions(accounts[1], 60000)
+    await didToken.issueDID(accounts[1], 60000)
 
     await tasks.addTask(task.taskId, task.title)
 
@@ -352,6 +356,11 @@ contract('Tasks', function(accounts) {
     // Issue DID such that some account owns
     // under the threshold of DID required
     // Here it's 20% each
+    await didToken.issueDID(accounts[0], 10000000)
+    await didToken.issueDID(accounts[1], 10000000)
+    await didToken.issueDID(accounts[2], 10000000)
+    await didToken.issueDID(accounts[3], 10000000)
+    await didToken.issueDID(accounts[4], 10000000)
     await didToken.incrementDIDFromContributions(accounts[0], 10000000)
     await didToken.incrementDIDFromContributions(accounts[1], 10000000)
     await didToken.incrementDIDFromContributions(accounts[2], 10000000)
@@ -395,6 +404,9 @@ contract('Tasks', function(accounts) {
     // Issue DID such that some account owns
     // under the threshold of DID required
     // Here it's 33% each
+    await didToken.issueDID(accounts[0], 10000000)
+    await didToken.issueDID(accounts[1], 10000000)
+    await didToken.issueDID(accounts[2], 10000000)
     await didToken.incrementDIDFromContributions(accounts[0], 10000000)
     await didToken.incrementDIDFromContributions(accounts[1], 10000000)
     await didToken.incrementDIDFromContributions(accounts[2], 10000000)
@@ -418,6 +430,14 @@ contract('Tasks', function(accounts) {
     // Issue DID such that some account owns
     // under the threshold of DID required
     // Here it's 20% each
+
+    await didToken.issueDID(accounts[0], 10000000)
+    await didToken.issueDID(accounts[1], 10000000)
+    await didToken.issueDID(accounts[2], 10000000)
+    await didToken.issueDID(accounts[3], 10000000)
+    await didToken.issueDID(accounts[4], 10000000)
+    await didToken.issueDID(accounts[5], 10000000)
+    await didToken.issueDID(accounts[6], 10000000)
     await didToken.incrementDIDFromContributions(accounts[0], 10000000)
     await didToken.incrementDIDFromContributions(accounts[1], 10000000)
     await didToken.incrementDIDFromContributions(accounts[2], 10000000)
@@ -447,6 +467,12 @@ contract('Tasks', function(accounts) {
     // Issue DID such that some account owns
     // under the threshold of DID required
     // Here it's 20% each
+    await didToken.issueDID(accounts[0], 10000000)
+    await didToken.issueDID(accounts[1], 10000000)
+    await didToken.issueDID(accounts[2], 10000000)
+    await didToken.issueDID(accounts[3], 10000000)
+    await didToken.issueDID(accounts[4], 10000000)
+    await didToken.issueDID(accounts[5], 10000000)
     await didToken.incrementDIDFromContributions(accounts[0], 10000000)
     await didToken.incrementDIDFromContributions(accounts[1], 10000000)
     await didToken.incrementDIDFromContributions(accounts[2], 10000000)
@@ -490,6 +516,10 @@ contract('Tasks', function(accounts) {
     // Issue DID such that some account owns
     // under the threshold of DID required
     // Here it's 25% each
+    await didToken.issueDID(accounts[0], 10000000)
+    await didToken.issueDID(accounts[1], 10000000)
+    await didToken.issueDID(accounts[2], 10000000)
+    await didToken.issueDID(accounts[3], 10000000)
     await didToken.incrementDIDFromContributions(accounts[0], 10000000)
     await didToken.incrementDIDFromContributions(accounts[1], 10000000)
     await didToken.incrementDIDFromContributions(accounts[2], 10000000)
@@ -506,6 +536,9 @@ contract('Tasks', function(accounts) {
   })
 
   it('should set the reward status as determined once enough DID or voters have voted', async function() {
+    await didToken.issueDID(accounts[0], 10000000)
+    await didToken.issueDID(accounts[1], 10000000)
+    await didToken.issueDID(accounts[2], 10000000)
     await didToken.incrementDIDFromContributions(accounts[0], 10000000)
     await didToken.incrementDIDFromContributions(accounts[1], 10000000)
     await didToken.incrementDIDFromContributions(accounts[2], 10000000)
@@ -569,6 +602,8 @@ contract('Tasks', function(accounts) {
   })
 
   it(`should delete tasks that have been paid and reposition the last array element into the deleted index`, async function() {
+    await didToken.issueDID(accounts[0], 10000000)
+    await didToken.issueDID(accounts[1], 10000000)
     await didToken.incrementDIDFromContributions(accounts[0], 10000000)
     await didToken.incrementDIDFromContributions(accounts[1], 10000000)
 
