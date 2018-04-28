@@ -37,7 +37,7 @@ contract DIDToken is Approvable, Debuggable {
     }
     mapping (address => DIDHolder) public DIDHolders;
 
-    constructor () {
+    function DIDToken () {
         name = "Distense DID";
         symbol = "DID";
         totalSupply = 0;
@@ -100,14 +100,8 @@ contract DIDToken is Approvable, Debuggable {
         uint256 DIDPerEther = distense.getParameterValueByTitle(distense.didPerEtherParameterTitle());
 
         uint256 numDIDToExchange = _numDIDToExchange * 1 ether;
-        emit LogString('numDIDToExchange ');
-        emit LogUInt256(numDIDToExchange );
         uint256 numWeiToIssue = calculateNumWeiToIssue(numDIDToExchange, DIDPerEther);
-        LogString('numWeiToIssue');
-        LogUInt256(numWeiToIssue);
         address contractAddress = this;
-        LogString('contractAddress.balance');
-        LogUInt256(contractAddress.balance);
 
         require(contractAddress.balance > numWeiToIssue, "DIDToken contract must have sufficient wei");
 
@@ -131,7 +125,9 @@ contract DIDToken is Approvable, Debuggable {
         return DIDHolders[msg.sender].balance;
     }
 
-    function investEtherForDID() canDepositThisManyEtherForDID external payable returns (uint256) {
+    function investEtherForDID() external payable returns (uint256) {
+        require(getNumWeiAddressMayInvest(msg.sender) >= msg.value);
+        require(investedAggregate < investmentLimitAggregate);
 
         Distense distense = Distense(DistenseAddress);
         uint256 DIDPerEther = SafeMath.div(distense.getParameterValueByTitle(distense.didPerEtherParameterTitle()), 1 ether);
@@ -209,35 +205,23 @@ contract DIDToken is Approvable, Debuggable {
         return DIDHolders[_address].weiInvested;
     }
 
-    function setDistenseAddress(address _distenseAddress) onlyApproved public  {
-        DistenseAddress = _distenseAddress;
-    }
-
     function calculateNumDIDToIssue(uint256 msgValue, uint256 DIDPerEther) public pure returns (uint256) {
         return SafeMath.mul(msgValue, DIDPerEther);
     }
 
     function calculateNumWeiToIssue(uint256 _numDIDToExchange, uint256 _DIDPerEther) public pure returns (uint256) {
-//        LogString('_numDIDToExchange');
-//        LogUInt256(_numDIDToExchange);
-//        LogString('_DIDPerEther');
-//        LogUInt256(_DIDPerEther);
         _numDIDToExchange = _numDIDToExchange * 1 ether;
         return SafeMath.div(_numDIDToExchange, _DIDPerEther);
     }
 
+    function setDistenseAddress(address _distenseAddress) onlyApproved public  {
+        DistenseAddress = _distenseAddress;
+    }
+
     modifier hasEnoughDIDFromContributions(uint256 _num) {
         uint256 netContributionsDID = getNetNumContributionsDID(msg.sender);
-        LogString('netContributionsDID2');
-        LogUInt256(netContributionsDID);
         require(DIDHolders[msg.sender].netContributionsDID >= (_num * 1 ether));
         _;
     }
 
-    modifier canDepositThisManyEtherForDID() {
-        uint256 numWeiMayInvest = getNumWeiAddressMayInvest(msg.sender);
-        require(numWeiMayInvest >= msg.value);
-        require(investedAggregate < investmentLimitAggregate);
-        _;
-    }
 }

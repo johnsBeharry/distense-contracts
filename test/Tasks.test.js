@@ -726,4 +726,12 @@ contract('Tasks', function(accounts) {
       'deleted task title should be the original title'
     )
   })
+
+  it('should set DistenseAddress', async function() {
+    const distenseAddress = await tasks.DistenseAddress.call()
+    await tasks.setDistenseAddress(accounts[6])
+
+    const updated = await tasks.DistenseAddress.call()
+    assert.notEqual(distenseAddress, updated)
+  })
 })

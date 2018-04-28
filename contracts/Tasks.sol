@@ -36,7 +36,7 @@ contract Tasks is Approvable, Debuggable {
 
     uint256 FLOAT_CONSTANT = 1000000000;
 
-    constructor(address _DIDTokenAddress, address _DistenseAddress) public {
+    function Tasks (address _DIDTokenAddress, address _DistenseAddress) public {
         DIDTokenAddress = _DIDTokenAddress;
         DistenseAddress = _DistenseAddress;
     }

@@ -171,7 +171,6 @@ contract('DIDToken', function(accounts) {
       )
     } catch (error) {
       etherForDIDExchangeError = error
-      console.error(`etherForDIDExchangeError: ${etherForDIDExchangeError}`)
     }
 
     const postInvestDIDBalance = await didToken.getAddressBalance.call(
@@ -503,7 +502,6 @@ contract('DIDToken', function(accounts) {
       )
     } catch (error) {
       etherForDIDExchangeError = error
-      console.error(`etherForDIDExchangeError: ${etherForDIDExchangeError}`)
     }
     assert.notEqual(etherForDIDExchangeError, undefined)
   })
@@ -629,5 +627,34 @@ contract('DIDToken', function(accounts) {
       numWeiThatShouldBeIssued.toString()
     ).add(etherBalance)
     assert.isAbove(endingBalance.toString(), etherBalance.toString())
+  })
+
+  it('hasEnoughDIDFromContributions', async function() {
+    let exchangeError
+    try {
+      assert.equal(
+        await didToken.getNetNumContributionsDID.call(accounts[1]),
+        0,
+        'accounts[1] must own 0 DID for this test to properly fail'
+      )
+      await didToken.exchangeDIDForEther(100, {
+        from: accounts[1]
+      })
+    } catch (error) {
+      exchangeError = error
+    }
+    assert.notEqual(
+      exchangeError,
+      undefined,
+      'Not enough DID from contributions'
+    )
+  })
+
+  it('should set DistenseAddress', async function() {
+    const distenseAddress = await didToken.DistenseAddress.call()
+    await didToken.setDistenseAddress(accounts[6])
+
+    const updated = await didToken.DistenseAddress.call()
+    assert.notEqual(distenseAddress, updated)
   })
 })

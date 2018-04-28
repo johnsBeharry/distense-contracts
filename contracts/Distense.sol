@@ -67,7 +67,7 @@ contract Distense is Approvable, Debuggable {
 
     event LogParameterValueUpdate(bytes32 title, uint256 value);
 
-    constructor (address _DIDTokenAddress) public {
+    function Distense  (address _DIDTokenAddress) public {
 
         DIDTokenAddress = _DIDTokenAddress;
 
@@ -204,8 +204,6 @@ contract Distense is Approvable, Debuggable {
         returns
     (uint256) {
 
-        require(_voteValue <= 100 * 1 ether);
-
         DIDToken didToken = DIDToken(DIDTokenAddress);
         uint256 votersDIDPercent = didToken.pctDIDOwned(msg.sender);
         require(votersDIDPercent > 0);
@@ -265,15 +263,14 @@ contract Distense is Approvable, Debuggable {
         parameter.votes[voter].lastVoted = now;
     }
 
+    function setDIDTokenAddress(address _didTokenAddress) public onlyApproved {
+        DIDTokenAddress = _didTokenAddress;
+    }
+
     modifier votingIntervalReached(address _voter, bytes32 _title) {
         Parameter storage parameter = parameters[_title];
         uint256 lastVotedOnParameter = parameter.votes[_voter].lastVoted * 1 ether;
         require((now * 1 ether) >= lastVotedOnParameter + getParameterValueByTitle(votingIntervalParameterTitle));
         _;
     }
-
-    function setDIDTokenAddress(address _didTokenAddress) public onlyApproved {
-        DIDTokenAddress = _didTokenAddress;
-    }
-
 }

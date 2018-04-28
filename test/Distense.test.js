@@ -8,6 +8,15 @@ import { convertSolidityIntToInt } from './helpers/utils'
 
 const oneEtherEquivalentWei = web3.toWei(1, 'ether')
 
+const increaseTime = addSeconds => {
+  web3.currentProvider.send({
+    jsonrpc: '2.0',
+    method: 'evm_increaseTime',
+    params: [addSeconds],
+    id: 0
+  })
+}
+
 contract('Distense contract', function(accounts) {
   const pctDIDToDetermineTaskRewardParameter = {
     title: 'pctDIDToDetermineTaskReward',
@@ -283,30 +292,60 @@ contract('Distense contract', function(accounts) {
   })
 
   it(`should restrict voting again if the votingInterval hasn't passed`, async function() {
-    let contractError
-
+    let shouldntError
+    // make sure first vote passes for test validity
     try {
       const userBalance = await didToken.getAddressBalance.call(accounts[0])
       assert.isAbove(userBalance, 0, 'user should have DID here to vote')
 
       await distense.voteOnParameter(
-        votingIntervalParameter.title,
-        votingIntervalParameter.value + 1
-      )
-
-      await distense.voteOnParameter(
-        votingIntervalParameter.title,
-        votingIntervalParameter.value + 1
+        maxRewardParameter.title,
+        maxRewardParameter.value * 1.1
       )
     } catch (error) {
-      contractError = error
+      shouldntError = error
+    }
+
+    assert.equal(
+      shouldntError,
+      undefined,
+      "this needs to work so we don't get a false positive below"
+    )
+
+    let shouldError
+    try {
+      const userBalance = await didToken.getAddressBalance.call(accounts[0])
+      assert.isAbove(userBalance, 0, 'user should have DID here to vote')
+
+      await distense.voteOnParameter(
+        maxRewardParameter.title,
+        maxRewardParameter.value * 1.1
+      )
+    } catch (error) {
+      shouldError = error
     }
 
     assert.notEqual(
-      contractError,
+      shouldError,
       undefined,
       'should throw an error because the voter is trying to vote twice'
     )
+
+    increaseTime(1000000000) // increase time past votingInterval value
+
+    let anotherError
+    try {
+      const userBalance = await didToken.getAddressBalance.call(accounts[0])
+      assert.isAbove(userBalance, 0, 'user should have DID here to vote')
+
+      await distense.voteOnParameter(
+        maxRewardParameter.title,
+        maxRewardParameter.value * 1.1
+      )
+    } catch (error) {
+      anotherError = error
+    }
+    assert.equal(anotherError, undefined)
   })
 
   it(`should allow voting only after the votingInterval has passed`, async function() {
@@ -480,23 +519,6 @@ contract('Distense contract', function(accounts) {
     )
   })
 
-  it(`should reject parameter votes for more than 100`, async function() {
-    await didToken.incrementDIDFromContributions(accounts[0], 20000)
-    await didToken.incrementDIDFromContributions(accounts[1], 20000)
-
-    let someError
-    const voteValue = new BigNumber(101).times(oneEtherEquivalentWei)
-
-    try {
-      await distense.voteOnParameter(votingIntervalParameter.title, voteValue)
-    } catch (e) {
-      someError = e
-      console.log(`${someError}`)
-    }
-
-    assert.notEqual(someError, undefined, 'should throw an error here')
-  })
-
   it(`should properly update the pctDIDRequiredToMergePullRequest value when upvoted with the proper requirements`, async function() {
     const userBalance = await didToken.getNetNumContributionsDID.call(
       accounts[0]
@@ -625,5 +647,13 @@ contract('Distense contract', function(accounts) {
       28800000000000000000,
       'updated value should be higher by the percentage of DID ownership of the voter'
     )
+  })
+
+  it('should set DIDTokenAddress', async function() {
+    const DIDTokenAddress = await distense.DIDTokenAddress.call()
+    await distense.setDIDTokenAddress(accounts[6])
+
+    const updated = await distense.DIDTokenAddress.call()
+    assert.notEqual(DIDTokenAddress, updated)
   })
 })
