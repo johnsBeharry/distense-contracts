@@ -727,6 +727,14 @@ contract('Tasks', function(accounts) {
     )
   })
 
+  it('should setDIDTokenAddress', async function() {
+    const didTokenAddress = await tasks.DIDTokenAddress.call()
+    await tasks.setDIDTokenAddress(accounts[6])
+
+    const updated = await tasks.DIDTokenAddress.call()
+    assert.notEqual(didTokenAddress, updated)
+  })
+
   it('should set DistenseAddress', async function() {
     const distenseAddress = await tasks.DistenseAddress.call()
     await tasks.setDistenseAddress(accounts[6])

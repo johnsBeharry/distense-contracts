@@ -467,4 +467,28 @@ contract('PullRequests', function(accounts) {
     const pr = await pullRequests.getPullRequestById.call(pullRequest.id)
     assert.equal(pr[2].toNumber(), '5959', 'prNum should be 5959')
   })
+
+  it('should set DIDTokenAddress', async function() {
+    const DIDTokenAddress = await pullRequests.DIDTokenAddress.call()
+    await pullRequests.setDIDTokenAddress(accounts[6])
+
+    const updated = await pullRequests.DIDTokenAddress.call()
+    assert.notEqual(DIDTokenAddress, updated)
+  })
+
+  it('should set DistenseAddress', async function() {
+    const distenseAddress = await pullRequests.DistenseAddress.call()
+    await pullRequests.setDistenseAddress(accounts[6])
+
+    const updated = await pullRequests.DistenseAddress.call()
+    assert.notEqual(distenseAddress, updated)
+  })
+
+  it('should set DistenseAddress', async function() {
+    const distenseAddress = await pullRequests.DistenseAddress.call()
+    await pullRequests.setDistenseAddress(accounts[6])
+
+    const updated = await pullRequests.DistenseAddress.call()
+    assert.notEqual(distenseAddress, updated)
+  })
 })
