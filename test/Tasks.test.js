@@ -62,6 +62,7 @@ contract('Tasks', function(accounts) {
   })
 
   it('should let those who own DID add tasks', async function() {
+    await didToken.issueDID(accounts[0], 101)
     await didToken.incrementDIDFromContributions(accounts[0], 101)
     await tasks.addTask(task.taskId, task.title)
     let numTasks = await tasks.getNumTasks.call()
@@ -115,6 +116,7 @@ contract('Tasks', function(accounts) {
   })
 
   it('should return false when someone tries to vote twice', async function() {
+    await didToken.issueDID(accounts[0], 1000000)
     await didToken.incrementDIDFromContributions(accounts[0], 1000000)
 
     await tasks.addTask(task.taskId, task.title)
@@ -226,6 +228,7 @@ contract('Tasks', function(accounts) {
   it('should correctly addTask', async function() {
     //  User must have DID to addTask()
     await didToken.incrementDIDFromContributions(accounts[0], 100)
+    await didToken.issueDID(accounts[0], 100)
 
     let numTasks = await tasks.getNumTasks.call()
     assert.equal(numTasks, 0, 'should have 0 tasks to begin with')
@@ -286,6 +289,7 @@ contract('Tasks', function(accounts) {
     let LogAddTaskEventListener = tasks.LogAddTask()
 
     await didToken.incrementDIDFromContributions(accounts[0], 190)
+    await didToken.issueDID(accounts[0], 190)
 
     await tasks.addTask(task.taskId, task.title)
 
@@ -322,6 +326,7 @@ contract('Tasks', function(accounts) {
   })
 
   it('should setTaskRewardPaid correctly', async function() {
+    await didToken.issueDID(accounts[0], 10000)
     await didToken.incrementDIDFromContributions(accounts[0], 10000)
     await tasks.addTask(task.taskId, task.title)
 
@@ -559,6 +564,8 @@ contract('Tasks', function(accounts) {
   })
 
   it('should correctly return the task reward and rewardStatus', async function() {
+    await didToken.issueDID(accounts[0], 10000000)
+    await didToken.issueDID(accounts[2], 10000000)
     await didToken.incrementDIDFromContributions(accounts[0], 10000000)
     await didToken.incrementDIDFromContributions(accounts[2], 10000000)
 
@@ -667,6 +674,8 @@ contract('Tasks', function(accounts) {
   })
 
   it(`should not delete tasks that haven't been paid`, async function() {
+    await didToken.issueDID(accounts[0], 10000000)
+    await didToken.issueDID(accounts[1], 10000000)
     await didToken.incrementDIDFromContributions(accounts[0], 10000000)
     await didToken.incrementDIDFromContributions(accounts[1], 10000000)
 

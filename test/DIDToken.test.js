@@ -41,11 +41,28 @@ contract('DIDToken', function(accounts) {
   it('should issueDID correctly', async function() {
     await didToken.issueDID(accounts[0], 4321)
     let newSupply = await didToken.totalSupply()
+    let balance = await didToken.getAddressBalance(accounts[0])
     assert.equal(newSupply.toString(), 4.321e21)
+    assert.equal(balance.toString(), 4.321e21)
 
     await didToken.issueDID(accounts[0], 112340876)
     newSupply = await didToken.totalSupply()
     assert.equal(newSupply.toNumber(), 1.12345197e26)
+
+    balance = await didToken.getAddressBalance(accounts[0])
+    assert.equal(balance.toString(), 1.12345197e26)
+
+    await didToken.issueDID(accounts[0], 1)
+    newSupply = await didToken.totalSupply()
+    assert.equal(newSupply.toNumber(), 1.12345198e26)
+
+    balance = await didToken.getAddressBalance(accounts[0])
+    assert.equal(balance.toString(), 1.12345198e26)
+
+    let otherBalance = await didToken.getAddressBalance(accounts[1])
+    assert.equal(otherBalance.toNumber(), 0)
+    newSupply = await didToken.totalSupply()
+    assert.equal(newSupply.toNumber(), 1.12345198e26)
   })
 
   it('should disallow issueDID from an empty address', async function() {
@@ -64,7 +81,6 @@ contract('DIDToken', function(accounts) {
   it('should allow issueDID from owner', async function() {
     let addError
     try {
-      //contract throws error here
       await didToken.issueDID(accounts[5], 9100, {
         from: accounts[0]
       })
@@ -73,6 +89,33 @@ contract('DIDToken', function(accounts) {
     }
     assert.equal(addError, undefined, 'Error must not be thrown')
     const balance = await didToken.getAddressBalance.call(accounts[5])
+    assert.equal(balance.toString(), 9.1e21)
+  })
+
+  it('should disallow issueDID from non-owner and allow from owner (accounts[0])', async function() {
+    let addError
+    try {
+      await didToken.issueDID(accounts[5], 9100, {
+        from: accounts[1]
+      })
+    } catch (error) {
+      addError = error
+    }
+    assert.notEqual(addError, undefined, 'Error must not be thrown')
+
+    let balance = await didToken.getAddressBalance.call(accounts[5])
+    assert.equal(balance.toNumber(), 0)
+
+    let anotherError
+    try {
+      await didToken.issueDID(accounts[5], 9100, {
+        from: accounts[0]
+      })
+    } catch (error) {
+      anotherError = error
+    }
+    assert.equal(anotherError, undefined, 'Error must not be thrown')
+    balance = await didToken.getAddressBalance.call(accounts[5])
     assert.equal(balance.toString(), 9.1e21)
   })
 
@@ -108,13 +151,16 @@ contract('DIDToken', function(accounts) {
 
   it("should throw an error when someone tries to exchange DID for ether who doesn't own DID", async function() {
     let exchangeError
+
+    assert.equal(
+      await didToken.getAddressBalance.call(accounts[1]),
+      0,
+      'accounts[1] must own 0 DID for this test to properly fail'
+    )
+
     try {
       //  accounts[1] has no DID so this should fail/throw an error
-      assert.equal(
-        await didToken.getAddressBalance.call(accounts[1]),
-        0,
-        'accounts[1] must own 0 DID for this test to properly fail'
-      )
+
       await didToken.exchangeDIDForEther(100, {
         from: accounts[1]
       })
@@ -259,6 +305,7 @@ contract('DIDToken', function(accounts) {
     // await didToken.issueDID(accounts[1], 2000)
     await didToken.incrementDIDFromContributions(accounts[1], 10000)
 
+    //  Investor gets 4000 DID here
     await didToken.investEtherForDID({
       from: accounts[1],
       value: web3.toWei(4)
@@ -272,6 +319,7 @@ contract('DIDToken', function(accounts) {
 
     const updatedBalance = await didToken.getAddressBalance.call(accounts[1])
 
+    //  Investor has 3999 DID here
     assert.equal(updatedBalance.toString(), 3.999e21)
   })
 
@@ -532,28 +580,28 @@ contract('DIDToken', function(accounts) {
       web3.toWei(0.1, 'ether'),
       1000
     )
-    assert.equal(DID.toString(), 100000000000000000000)
+    assert.equal(DID.toNumber(), 100000000000000000000) // 100
 
     DID = await didToken.calculateNumDIDToIssue.call(
       web3.toWei(0.5, 'ether'),
       1000
     )
-    assert.equal(DID.toString(), 500000000000000000000)
+    assert.equal(DID.toNumber(), 500000000000000000000) //  500
 
     DID = await didToken.calculateNumDIDToIssue.call(
       web3.toWei(1.1, 'ether'),
       1100
     )
-    assert.equal(DID.toString(), 1.21e21)
+    assert.equal(DID.toNumber(), 1.21e21) //  1210
 
     DID = await didToken.calculateNumDIDToIssue.call(
       web3.toWei(3.3333, 'ether'),
       1100
     )
-    assert.equal(DID.toString(), 3.66663e21)
+    assert.equal(DID.toNumber(), 3.66663e21)
   })
 
-  it('investEtherForDID should decrement the DID balances of an address', async function() {
+  it('investEtherForDID should increment the DID balances of an address', async function() {
     //  make sure the contract has ether to return for the DID or this will fail
     await didToken.issueDID(accounts[1], 10000)
     await didToken.incrementDIDFromContributions(accounts[1], 10000)
@@ -564,7 +612,8 @@ contract('DIDToken', function(accounts) {
     })
 
     const didBalance = await didToken.getAddressBalance.call(accounts[1])
-    assert.isBelow(didBalance.toString(), web3.toWei(10000, 'ether'), '')
+    assert.isBelow(didBalance.toString(), web3.toWei(10000, 'ether'))
+    assert.equal(didBalance.toString(), '1.3e+22')
   })
 
   it('calculateNumWeiToIssue should perform correctly', async function() {
@@ -600,11 +649,7 @@ contract('DIDToken', function(accounts) {
     await didToken.issueDID(accounts[1], 10000)
     await didToken.incrementDIDFromContributions(accounts[1], 10000)
     await didToken.incrementDIDFromContributions(accounts[0], 12000)
-    const numContributionsDID = await didToken.getNetNumContributionsDID.call(
-      accounts[0]
-    )
 
-    const originalBalance = await web3.eth.getBalance(accounts[0])
     await didToken.investEtherForDID({
       from: accounts[1],
       value: web3.toWei(5, 'ether')
@@ -612,10 +657,9 @@ contract('DIDToken', function(accounts) {
 
     const numDIDToExchange = 100
 
-    let etherBalance = await web3.eth.getBalance(accounts[1])
     await didToken.exchangeDIDForEther(numDIDToExchange)
 
-    etherBalance = await web3.eth.getBalance(accounts[1])
+    let etherBalance = await web3.eth.getBalance(accounts[1])
     const didPerEtherParameterValue = await distense.getParameterValueByTitle.call(
       'didPerEther'
     )
@@ -629,7 +673,7 @@ contract('DIDToken', function(accounts) {
     assert.isAbove(endingBalance.toString(), etherBalance.toString())
   })
 
-  it('hasEnoughDIDFromContributions', async function() {
+  it('Reject exchange from those without enough contributions', async function() {
     let exchangeError
     try {
       assert.equal(
@@ -648,6 +692,34 @@ contract('DIDToken', function(accounts) {
       undefined,
       'Not enough DID from contributions'
     )
+  })
+
+  //  Basically testing this line: `require(contractAddress.balance >= numWeiToIssue, "DIDToken contract must have sufficient wei");`
+  it("should not affect DID balances, netContributions or totalSupply when the contract doesn't have enough ether", async function() {
+    //  make sure the contract has ether to return for the DID or this will fail
+    // await didToken.issueDID(accounts[1], 2000)
+    await didToken.incrementDIDFromContributions(accounts[1], 10000)
+    await didToken.issueDID(accounts[1], 10000)
+    let updatedBalance = await didToken.getAddressBalance.call(accounts[1])
+    let netContributions = await didToken.getNetNumContributionsDID(accounts[1])
+    let totalSupply = await didToken.totalSupply.call()
+    assert.equal(updatedBalance.toNumber(), 1e22)
+    assert.equal(netContributions.toNumber(), 1e22)
+    assert.equal(totalSupply.toNumber(), 1e22)
+
+    let anError
+    try {
+      await didToken.exchangeDIDForEther(100)
+    } catch (err) {
+      anError = err
+    }
+    updatedBalance = await didToken.getAddressBalance.call(accounts[1])
+    netContributions = await didToken.getNetNumContributionsDID(accounts[1])
+    totalSupply = await didToken.totalSupply.call()
+
+    assert.equal(updatedBalance.toNumber(), 1e22)
+    assert.equal(netContributions.toNumber(), 1e22)
+    assert.equal(totalSupply.toNumber(), 1e22)
   })
 
   it('should set DistenseAddress', async function() {

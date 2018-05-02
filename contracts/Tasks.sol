@@ -91,7 +91,7 @@ contract Tasks is Approvable, Debuggable {
     function taskRewardVote(bytes32 _taskId, uint256 _reward) external returns (bool) {
 
         DIDToken didToken = DIDToken(DIDTokenAddress);
-        uint256 balance = didToken.getNetNumContributionsDID(msg.sender);
+        uint256 balance = didToken.getAddressBalance(msg.sender);
         Distense distense = Distense(DistenseAddress);
 
         Task storage task = tasks[_taskId];
@@ -199,7 +199,7 @@ contract Tasks is Approvable, Debuggable {
 
     modifier hasEnoughDIDToAddTask() {
         DIDToken didToken = DIDToken(DIDTokenAddress);
-        uint256 balance = didToken.getNetNumContributionsDID(msg.sender);
+        uint256 balance = didToken.getAddressBalance(msg.sender);
 
         Distense distense = Distense(DistenseAddress);
         uint256 numDIDRequiredToAddTask = distense.getParameterValueByTitle(

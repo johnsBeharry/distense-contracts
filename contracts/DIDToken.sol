@@ -54,6 +54,7 @@ contract DIDToken is Approvable, Debuggable {
         uint256 balance = DIDHolders[_recipient].balance;
         DIDHolders[_recipient].balance = SafeMath.add(balance, _numDID);
 
+        //  If is a new DIDHolder, set their position in DIDHoldersArray
         if (DIDHolders[_recipient].DIDHoldersIndex == 0)
             DIDHolders[_recipient].DIDHoldersIndex = DIDHoldersArray.push(_recipient) - 1;
 
@@ -65,6 +66,7 @@ contract DIDToken is Approvable, Debuggable {
     function decrementDID(address _address, uint256 _numDID) external onlyApproved returns (uint256) {
         require(_address != address(0));
         require(_numDID > 0);
+
         uint256 numDID = _numDID * 1 ether;
         require(SafeMath.sub(DIDHolders[_address].balance, numDID) >= 0);
         require(SafeMath.sub(totalSupply, numDID ) >= 0);
@@ -87,23 +89,22 @@ contract DIDToken is Approvable, Debuggable {
         return DIDHolders[_address].balance;
     }
 
-    function pctDIDOwned(address _address) external view returns (uint256) {
-        return SafeMath.percent(DIDHolders[_address].balance, totalSupply, 20);
-    }
-
     function exchangeDIDForEther(uint256 _numDIDToExchange)
-        hasEnoughDIDFromContributions(_numDIDToExchange)
         external
     returns (uint256) {
+
+        uint256 netContributionsDID = getNetNumContributionsDID(msg.sender);
+        require(DIDHolders[msg.sender].netContributionsDID >= (_numDIDToExchange * 1 ether));
 
         Distense distense = Distense(DistenseAddress);
         uint256 DIDPerEther = distense.getParameterValueByTitle(distense.didPerEtherParameterTitle());
 
         uint256 numDIDToExchange = _numDIDToExchange * 1 ether;
+        require(numDIDToExchange < totalSupply);
+
         uint256 numWeiToIssue = calculateNumWeiToIssue(numDIDToExchange, DIDPerEther);
         address contractAddress = this;
-
-        require(contractAddress.balance > numWeiToIssue, "DIDToken contract must have sufficient wei");
+        require(contractAddress.balance >= numWeiToIssue, "DIDToken contract must have sufficient wei");
 
         //  Adjust number of DID owned first
         DIDHolders[msg.sender].balance = SafeMath.sub(DIDHolders[msg.sender].balance, numDIDToExchange);
@@ -166,6 +167,10 @@ contract DIDToken is Approvable, Debuggable {
         return true;
     }
 
+    function pctDIDOwned(address _address) external view returns (uint256) {
+        return SafeMath.percent(DIDHolders[_address].balance, totalSupply, 20);
+    }
+
     function getNumWeiAddressMayInvest(address _contributor) public view returns (uint256) {
 
         uint256 DIDFromContributions = DIDHolders[_contributor].netContributionsDID;
@@ -216,12 +221,6 @@ contract DIDToken is Approvable, Debuggable {
 
     function setDistenseAddress(address _distenseAddress) onlyApproved public  {
         DistenseAddress = _distenseAddress;
-    }
-
-    modifier hasEnoughDIDFromContributions(uint256 _num) {
-        uint256 netContributionsDID = getNetNumContributionsDID(msg.sender);
-        require(DIDHolders[msg.sender].netContributionsDID >= (_num * 1 ether));
-        _;
     }
 
 }
