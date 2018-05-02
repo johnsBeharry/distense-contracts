@@ -99,19 +99,6 @@ contract('PullRequests', function(accounts) {
       pullRequest.taskId,
       pullRequest.prNum
     )
-
-    // let adjustedTotalSupply = await didToken.totalSupply.call()
-    // const testTask = await tasks.getTaskById.call(pullRequest.taskId)
-    //
-    // await pullRequests.approvePullRequest(pullRequest.id)
-    // adjustedTotalSupply = +adjustedTotalSupply + +testTask[2]
-    //
-    // const postTotalSupply = await didToken.totalSupply.call()
-    // assert.equal(
-    //   adjustedTotalSupply,
-    //   postTotalSupply.toString(),
-    //   'after total supply should be correctly higher than the beginning one'
-    // )
   })
 
   it('should addPullRequests correctly', async function() {
@@ -158,7 +145,7 @@ contract('PullRequests', function(accounts) {
         'balance should be 100 or less than threshold here'
       )
 
-      await pullRequests.approvePullRequest(pullRequestTwo.id, false)
+      await pullRequests.approvePullRequest(pullRequestTwo.id)
     } catch (error) {
       aNewError = error
     }
@@ -222,6 +209,61 @@ contract('PullRequests', function(accounts) {
     )
   })
 
+  it("should reject approval votes from the pullRequest contributor's own address", async function() {
+    await didToken.issueDID(accounts[0], 1200000)
+    await didToken.issueDID(accounts[1], 1200000)
+    await didToken.incrementDIDFromContributions(accounts[0], 1200000)
+    await didToken.incrementDIDFromContributions(accounts[1], 1200000)
+
+    await tasks.addTask(pullRequest.taskId, 'some amazing title')
+    await pullRequests.addPullRequest(
+      pullRequest.id,
+      pullRequest.taskId,
+      pullRequest.prNum
+    )
+
+    await didToken.approve(pullRequests.address)
+    const pullRequestsDIDTokenApproved = await didToken.approved.call(
+      pullRequests.address
+    )
+    assert.equal(
+      pullRequestsDIDTokenApproved,
+      true,
+      'pullRequests has to be approved here'
+    )
+
+    await tasks.approve(pullRequests.address)
+    const pullRequestsTasksApproved = await tasks.approved.call(
+      pullRequests.address
+    )
+    assert.equal(
+      pullRequestsTasksApproved,
+      true,
+      'pullRequests has to be tasks approved here'
+    )
+
+    let anError
+    try {
+      await pullRequests.approvePullRequest(pullRequest.id, {
+        from: accounts[0]
+      })
+    } catch (error) {
+      anError = error
+    }
+    assert.notEqual(anError, undefined)
+
+    let noError
+    //  same function attempt but from difference address (with DID) should be able to approve the PR
+    try {
+      await pullRequests.approvePullRequest(pullRequest.id, {
+        from: accounts[1]
+      })
+    } catch (error) {
+      noError = error
+    }
+    assert.equal(noError, undefined)
+  })
+
   it('approvePullRequest() should increment the pctDIDApproved correctly', async function() {
     await didToken.issueDID(accounts[0], 1200000)
     await didToken.issueDID(accounts[1], 1200000)
@@ -263,7 +305,6 @@ contract('PullRequests', function(accounts) {
 
     const votedOnPR = await pullRequests.getPullRequestById.call(pullRequest.id)
     assert.equal(votedOnPR[3].toNumber(), 20000000000000000000, '')
-    // assert.equal(true, false)
   })
 
   it('should fire event "LogAddPullRequest" when addPullRequest is appropriately called', async function() {

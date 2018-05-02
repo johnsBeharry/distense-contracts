@@ -59,11 +59,12 @@ contract PullRequests is Approvable, Debuggable {
     }
 
     function approvePullRequest(bytes32 _prId)
-        hasntVoted(_prId)
         hasEnoughDIDToApprovePR()
         external
     returns (uint256) {
 
+        require(pullRequests[_prId].voted[msg.sender] == false);
+        require(pullRequests[_prId].contributor != msg.sender, "contributor voted on their PR");
         Distense distense = Distense(DistenseAddress);
         DIDToken didToken = DIDToken(DIDTokenAddress);
 
@@ -100,12 +101,6 @@ contract PullRequests is Approvable, Debuggable {
 
         emit LogPullRequestApprovalVote(_prId, _pr.pctDIDApproved);
         return _pr.pctDIDApproved;
-    }
-
-    modifier hasntVoted(bytes32 _prId) {
-        bool alreadyVoted = pullRequests[_prId].voted[msg.sender];
-        require(alreadyVoted == false);
-        _;
     }
 
     modifier hasEnoughDIDToApprovePR() {
