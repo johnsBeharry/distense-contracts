@@ -421,7 +421,7 @@ contract('PullRequests', function(accounts) {
     )
 
     await pullRequests.approvePullRequest(pullRequest.id, {
-      from: accounts[0]
+      from: accounts[4]
     })
 
     let LogRewardPullRequestEvents = pullRequests.LogRewardPullRequest()
@@ -437,12 +437,17 @@ contract('PullRequests', function(accounts) {
     assert.equal(eventArgs.taskId, pullRequest.taskId)
   })
 
-  //  reviewed 4-14-2018 JJA
+  //  reviewed 5-2-2018 JJA
   it("should increment a contributor's Contributions DID correctly after a pull request reaches the required approvals", async function() {
     const origNumDIDFromContributions = 10000
     await didToken.issueDID(accounts[0], 1000000)
     await didToken.incrementDIDFromContributions(
       accounts[0],
+      origNumDIDFromContributions
+    )
+    await didToken.issueDID(accounts[1], 1000000)
+    await didToken.incrementDIDFromContributions(
+      accounts[1],
       origNumDIDFromContributions
     )
 
@@ -482,7 +487,7 @@ contract('PullRequests', function(accounts) {
       pullRequest.prNum
     )
 
-    await pullRequests.approvePullRequest(pullRequest.id)
+    await pullRequests.approvePullRequest(pullRequest.id, { from: accounts[1] })
 
     const contributionsDID = await didToken.getNetNumContributionsDID.call(
       accounts[0]

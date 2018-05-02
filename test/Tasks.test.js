@@ -655,7 +655,7 @@ contract('Tasks', function(accounts) {
       'pullRequests has to be tasks approved here'
     )
 
-    await pullRequests.approvePullRequest(pullRequest.id)
+    await pullRequests.approvePullRequest(pullRequest.id, { from: accounts[1] })
 
     let numTaskIds = await tasks.getNumTasks.call()
     assert.equal(numTaskIds.toString(), '4', 'should be 4 tasks')
