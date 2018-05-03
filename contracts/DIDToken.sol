@@ -185,9 +185,10 @@ contract DIDToken is Approvable, Debuggable {
     }
 
     function rewardContributor(address _contributor, uint256 _reward) onlyApproved external returns (bool) {
-        issueDID(_contributor, _reward);
+        uint256 reward = SafeMath.div(_reward, 1 ether);
+        issueDID(_contributor, reward);
         incrementTasksCompleted(_contributor);
-        incrementDIDFromContributions(_contributor, _reward);
+        incrementDIDFromContributions(_contributor, reward);
     }
 
     function getWeiAggregateMayInvest() public view returns (uint256) {

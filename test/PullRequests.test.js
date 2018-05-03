@@ -4,11 +4,6 @@ const PullRequests = artifacts.require('PullRequests')
 const DIDToken = artifacts.require('DIDToken')
 const Distense = artifacts.require('Distense')
 
-import {
-  convertIntToSolidityInt,
-  convertSolidityIntToInt
-} from './helpers/utils'
-
 contract('PullRequests', function(accounts) {
   let didToken
   let distense
@@ -439,17 +434,14 @@ contract('PullRequests', function(accounts) {
 
   //  reviewed 5-2-2018 JJA
   it("should increment a contributor's Contributions DID correctly after a pull request reaches the required approvals", async function() {
-    const origNumDIDFromContributions = 10000
+    const origNumDIDFromContributions = 1000000
     await didToken.issueDID(accounts[0], 1000000)
     await didToken.incrementDIDFromContributions(
       accounts[0],
       origNumDIDFromContributions
     )
     await didToken.issueDID(accounts[1], 1000000)
-    await didToken.incrementDIDFromContributions(
-      accounts[1],
-      origNumDIDFromContributions
-    )
+    await didToken.incrementDIDFromContributions(accounts[1], 1000000)
 
     await tasks.addTask(pullRequest.taskId, 'some title')
     const taskExists = await tasks.taskExists.call(pullRequest.taskId)
@@ -493,9 +485,11 @@ contract('PullRequests', function(accounts) {
       accounts[0]
     )
     const DID = await didToken.getAddressBalance.call(accounts[0])
+    const totalSupply = await didToken.totalSupply.call()
 
-    assert.isAbove(DID, 1000000)
-    assert.isAbove(contributionsDID, origNumDIDFromContributions)
+    assert.equal(DID.toNumber(), 1.00028e24)
+    assert.equal(contributionsDID.toNumber(), 1.00028e24)
+    assert.equal(totalSupply.toNumber(), 2.00028e24)
   })
 
   it('should set the prNum correctly when adding pullRequests', async function() {
