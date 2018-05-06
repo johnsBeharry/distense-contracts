@@ -1,10 +1,10 @@
 {
   "name": "distense-contracts",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Distense Ethereum smart contracts and tests",
   "main": "",
   "scripts": {
-    "test": "./node_modules/.bin/run-with-testrpc  -l 8000000 'truffle test'",
+    "test": "truffle test",
     "coverage": "./node_modules/.bin/solidity-coverage",
     "migrateLocal": "truffle migrate --network ganache  --reset --compile-all"
   },
@@ -29,7 +29,7 @@
     "bignumber.js": "git+https://github.com/debris/bignumber.js.git#94d7146671b9719e00a09c29b01a691bc85048c2",
     "node-fetch": "^1.7.3",
     "prettier": "^1.10.2",
-    "truffle": "^4.1.5",
+    "truffle": "^4.1.7",
     "truffle-contract": "^3.0.0",
     "web3-utils": "^1.0.0-beta.27"
   },
