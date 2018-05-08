@@ -481,7 +481,7 @@ contract('PullRequests', function(accounts) {
 
     await pullRequests.approvePullRequest(pullRequest.id, { from: accounts[1] })
 
-    const contributionsDID = await didToken.getNetNumContributionsDID.call(
+    const contributionsDID = await didToken.getNumContributionsDID.call(
       accounts[0]
     )
     const DID = await didToken.getAddressBalance.call(accounts[0])

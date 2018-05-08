@@ -112,7 +112,7 @@ contract PullRequests is Approvable, Debuggable {
 
         DIDToken didToken = DIDToken(DIDTokenAddress);
 
-        require(didToken.getNetNumContributionsDID(msg.sender) > threshold);
+        require(didToken.getNumContributionsDID(msg.sender) > threshold);
         _;
     }
 

@@ -349,7 +349,7 @@ contract('Distense contract', function(accounts) {
   })
 
   it(`should allow voting only after the votingInterval has passed`, async function() {
-    const userBalance = await didToken.getNetNumContributionsDID(accounts[0])
+    const userBalance = await didToken.getNumContributionsDID(accounts[0])
     assert.isAbove(
       userBalance.toString(),
       0,
@@ -379,9 +379,7 @@ contract('Distense contract', function(accounts) {
   })
 
   it(`should properly update the votingInterval parameter value when voted upon with the proper requirements`, async function() {
-    const userBalance = await didToken.getNetNumContributionsDID.call(
-      accounts[0]
-    )
+    const userBalance = await didToken.getNumContributionsDID.call(accounts[0])
     assert.isAbove(
       userBalance.toNumber(),
       200,
@@ -402,9 +400,7 @@ contract('Distense contract', function(accounts) {
   })
 
   it(`should properly update the votingInterval parameter value when voted upon`, async function() {
-    const userBalance = await didToken.getNetNumContributionsDID.call(
-      accounts[0]
-    )
+    const userBalance = await didToken.getNumContributionsDID.call(accounts[0])
     assert.isAbove(
       userBalance.toNumber(),
       web3.toWei(200, 'ether'),
@@ -520,9 +516,7 @@ contract('Distense contract', function(accounts) {
   })
 
   it(`should properly update the pctDIDRequiredToMergePullRequest value when upvoted with the proper requirements`, async function() {
-    const userBalance = await didToken.getNetNumContributionsDID.call(
-      accounts[0]
-    )
+    const userBalance = await didToken.getNumContributionsDID.call(accounts[0])
     assert.equal(
       userBalance.toNumber(),
       2e21,

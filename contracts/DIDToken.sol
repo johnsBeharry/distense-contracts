@@ -93,7 +93,7 @@ contract DIDToken is Approvable, Debuggable {
         external
     returns (uint256) {
 
-        uint256 netContributionsDID = getNetNumContributionsDID(msg.sender);
+        uint256 netContributionsDID = getNumContributionsDID(msg.sender);
         require(DIDHolders[msg.sender].netContributionsDID >= (_numDIDToExchange * 1 ether));
 
         Distense distense = Distense(DistenseAddress);
@@ -133,14 +133,11 @@ contract DIDToken is Approvable, Debuggable {
         Distense distense = Distense(DistenseAddress);
         uint256 DIDPerEther = SafeMath.div(distense.getParameterValueByTitle(distense.didPerEtherParameterTitle()), 1 ether);
 
-        require(getNumWeiAddressMayInvest(msg.sender) >= msg.value);
-
         uint256 numDIDToIssue = calculateNumDIDToIssue(msg.value, DIDPerEther);
         require(DIDHolders[msg.sender].netContributionsDID >= numDIDToIssue);
-
         totalSupply = SafeMath.add(totalSupply, numDIDToIssue);
         DIDHolders[msg.sender].balance = SafeMath.add(DIDHolders[msg.sender].balance, numDIDToIssue);
-        decrementDIDFromContributions(msg.sender, numDIDToIssue);
+        DIDHolders[msg.sender].netContributionsDID = SafeMath.sub(DIDHolders[msg.sender].netContributionsDID, numDIDToIssue);
 
         DIDHolders[msg.sender].weiInvested += msg.value;
         investedAggregate = investedAggregate + msg.value;
@@ -154,12 +151,6 @@ contract DIDToken is Approvable, Debuggable {
     function incrementDIDFromContributions(address _contributor, uint256 _reward) onlyApproved public {
         uint256 weiReward = _reward * 1 ether;
         DIDHolders[_contributor].netContributionsDID = SafeMath.add(DIDHolders[_contributor].netContributionsDID, weiReward);
-        totalSupply += _reward;
-    }
-
-    function decrementDIDFromContributions(address _contributor, uint256 _num) internal returns (uint256) {
-        DIDHolders[_contributor].netContributionsDID = SafeMath.sub(DIDHolders[_contributor].netContributionsDID, _num);
-        return DIDHolders[_contributor].netContributionsDID;
     }
 
     function incrementTasksCompleted(address _contributor) onlyApproved public returns (bool) {
@@ -203,7 +194,7 @@ contract DIDToken is Approvable, Debuggable {
         return DIDHolders[_address].balance;
     }
 
-    function getNetNumContributionsDID(address _address) public view returns (uint256) {
+    function getNumContributionsDID(address _address) public view returns (uint256) {
         return DIDHolders[_address].netContributionsDID;
     }
 
