@@ -102,14 +102,14 @@
     "absolutePath": "/Users/john/distense-contracts/contracts/Debuggable.sol",
     "exportedSymbols": {
       "Debuggable": [
-        964
+        931
       ]
     },
-    "id": 965,
+    "id": 932,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 931,
+        "id": 898,
         "literals": [
           "solidity",
           "^",
@@ -125,9 +125,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 964,
+        "id": 931,
         "linearizedBaseContracts": [
-          964
+          931
         ],
         "name": "Debuggable",
         "nodeType": "ContractDefinition",
@@ -135,20 +135,20 @@
           {
             "anonymous": false,
             "documentation": null,
-            "id": 935,
+            "id": 902,
             "name": "LogAddress",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 934,
+              "id": 901,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 933,
+                  "id": 900,
                   "indexed": false,
                   "name": "someAddress",
                   "nodeType": "VariableDeclaration",
-                  "scope": 935,
+                  "scope": 902,
                   "src": "71:19:1",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -157,7 +157,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 932,
+                    "id": 899,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "71:7:1",
@@ -177,20 +177,20 @@
           {
             "anonymous": false,
             "documentation": null,
-            "id": 939,
+            "id": 906,
             "name": "LogBool",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 938,
+              "id": 905,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 937,
+                  "id": 904,
                   "indexed": false,
                   "name": "boolean",
                   "nodeType": "VariableDeclaration",
-                  "scope": 939,
+                  "scope": 906,
                   "src": "111:12:1",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -199,7 +199,7 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 936,
+                    "id": 903,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
                     "src": "111:4:1",
@@ -219,20 +219,20 @@
           {
             "anonymous": false,
             "documentation": null,
-            "id": 943,
+            "id": 910,
             "name": "LogBytes",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 942,
+              "id": 909,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 941,
+                  "id": 908,
                   "indexed": false,
                   "name": "someBytes",
                   "nodeType": "VariableDeclaration",
-                  "scope": 943,
+                  "scope": 910,
                   "src": "145:15:1",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -241,7 +241,7 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 940,
+                    "id": 907,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
                     "src": "145:5:1",
@@ -261,20 +261,20 @@
           {
             "anonymous": false,
             "documentation": null,
-            "id": 947,
+            "id": 914,
             "name": "LogBytes32",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 946,
+              "id": 913,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 945,
+                  "id": 912,
                   "indexed": false,
                   "name": "aBytes32",
                   "nodeType": "VariableDeclaration",
-                  "scope": 947,
+                  "scope": 914,
                   "src": "184:16:1",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -283,7 +283,7 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 944,
+                    "id": 911,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
                     "src": "184:7:1",
@@ -303,20 +303,20 @@
           {
             "anonymous": false,
             "documentation": null,
-            "id": 951,
+            "id": 918,
             "name": "LogString",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 950,
+              "id": 917,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 949,
+                  "id": 916,
                   "indexed": false,
                   "name": "aString",
                   "nodeType": "VariableDeclaration",
-                  "scope": 951,
+                  "scope": 918,
                   "src": "223:14:1",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -325,7 +325,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 948,
+                    "id": 915,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "223:6:1",
@@ -345,20 +345,20 @@
           {
             "anonymous": false,
             "documentation": null,
-            "id": 955,
+            "id": 922,
             "name": "LogUInt256",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 954,
+              "id": 921,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 953,
+                  "id": 920,
                   "indexed": false,
                   "name": "someInt",
                   "nodeType": "VariableDeclaration",
-                  "scope": 955,
+                  "scope": 922,
                   "src": "261:15:1",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -367,7 +367,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 952,
+                    "id": 919,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "261:7:1",
@@ -387,20 +387,20 @@
           {
             "anonymous": false,
             "documentation": null,
-            "id": 959,
+            "id": 926,
             "name": "LogInt256",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 958,
+              "id": 925,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 957,
+                  "id": 924,
                   "indexed": false,
                   "name": "someInt",
                   "nodeType": "VariableDeclaration",
-                  "scope": 959,
+                  "scope": 926,
                   "src": "299:14:1",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -409,7 +409,7 @@
                     "typeString": "int256"
                   },
                   "typeName": {
-                    "id": 956,
+                    "id": 923,
                     "name": "int256",
                     "nodeType": "ElementaryTypeName",
                     "src": "299:6:1",
@@ -428,13 +428,13 @@
           },
           {
             "body": {
-              "id": 962,
+              "id": 929,
               "nodeType": "Block",
               "src": "350:8:1",
               "statements": []
             },
             "documentation": null,
-            "id": 963,
+            "id": 930,
             "implemented": true,
             "isConstructor": true,
             "isDeclaredConst": false,
@@ -442,26 +442,26 @@
             "name": "Debuggable",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 960,
+              "id": 927,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "340:2:1"
             },
             "payable": false,
             "returnParameters": {
-              "id": 961,
+              "id": 928,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "350:0:1"
             },
-            "scope": 964,
+            "scope": 931,
             "src": "321:37:1",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 965,
+        "scope": 932,
         "src": "27:334:1"
       }
     ],
@@ -471,14 +471,14 @@
     "absolutePath": "/Users/john/distense-contracts/contracts/Debuggable.sol",
     "exportedSymbols": {
       "Debuggable": [
-        964
+        931
       ]
     },
-    "id": 965,
+    "id": 932,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 931,
+        "id": 898,
         "literals": [
           "solidity",
           "^",
@@ -494,9 +494,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 964,
+        "id": 931,
         "linearizedBaseContracts": [
-          964
+          931
         ],
         "name": "Debuggable",
         "nodeType": "ContractDefinition",
@@ -504,20 +504,20 @@
           {
             "anonymous": false,
             "documentation": null,
-            "id": 935,
+            "id": 902,
             "name": "LogAddress",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 934,
+              "id": 901,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 933,
+                  "id": 900,
                   "indexed": false,
                   "name": "someAddress",
                   "nodeType": "VariableDeclaration",
-                  "scope": 935,
+                  "scope": 902,
                   "src": "71:19:1",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -526,7 +526,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 932,
+                    "id": 899,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "71:7:1",
@@ -546,20 +546,20 @@
           {
             "anonymous": false,
             "documentation": null,
-            "id": 939,
+            "id": 906,
             "name": "LogBool",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 938,
+              "id": 905,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 937,
+                  "id": 904,
                   "indexed": false,
                   "name": "boolean",
                   "nodeType": "VariableDeclaration",
-                  "scope": 939,
+                  "scope": 906,
                   "src": "111:12:1",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -568,7 +568,7 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 936,
+                    "id": 903,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
                     "src": "111:4:1",
@@ -588,20 +588,20 @@
           {
             "anonymous": false,
             "documentation": null,
-            "id": 943,
+            "id": 910,
             "name": "LogBytes",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 942,
+              "id": 909,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 941,
+                  "id": 908,
                   "indexed": false,
                   "name": "someBytes",
                   "nodeType": "VariableDeclaration",
-                  "scope": 943,
+                  "scope": 910,
                   "src": "145:15:1",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -610,7 +610,7 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 940,
+                    "id": 907,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
                     "src": "145:5:1",
@@ -630,20 +630,20 @@
           {
             "anonymous": false,
             "documentation": null,
-            "id": 947,
+            "id": 914,
             "name": "LogBytes32",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 946,
+              "id": 913,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 945,
+                  "id": 912,
                   "indexed": false,
                   "name": "aBytes32",
                   "nodeType": "VariableDeclaration",
-                  "scope": 947,
+                  "scope": 914,
                   "src": "184:16:1",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -652,7 +652,7 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 944,
+                    "id": 911,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
                     "src": "184:7:1",
@@ -672,20 +672,20 @@
           {
             "anonymous": false,
             "documentation": null,
-            "id": 951,
+            "id": 918,
             "name": "LogString",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 950,
+              "id": 917,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 949,
+                  "id": 916,
                   "indexed": false,
                   "name": "aString",
                   "nodeType": "VariableDeclaration",
-                  "scope": 951,
+                  "scope": 918,
                   "src": "223:14:1",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -694,7 +694,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 948,
+                    "id": 915,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "223:6:1",
@@ -714,20 +714,20 @@
           {
             "anonymous": false,
             "documentation": null,
-            "id": 955,
+            "id": 922,
             "name": "LogUInt256",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 954,
+              "id": 921,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 953,
+                  "id": 920,
                   "indexed": false,
                   "name": "someInt",
                   "nodeType": "VariableDeclaration",
-                  "scope": 955,
+                  "scope": 922,
                   "src": "261:15:1",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -736,7 +736,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 952,
+                    "id": 919,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "261:7:1",
@@ -756,20 +756,20 @@
           {
             "anonymous": false,
             "documentation": null,
-            "id": 959,
+            "id": 926,
             "name": "LogInt256",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 958,
+              "id": 925,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 957,
+                  "id": 924,
                   "indexed": false,
                   "name": "someInt",
                   "nodeType": "VariableDeclaration",
-                  "scope": 959,
+                  "scope": 926,
                   "src": "299:14:1",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -778,7 +778,7 @@
                     "typeString": "int256"
                   },
                   "typeName": {
-                    "id": 956,
+                    "id": 923,
                     "name": "int256",
                     "nodeType": "ElementaryTypeName",
                     "src": "299:6:1",
@@ -797,13 +797,13 @@
           },
           {
             "body": {
-              "id": 962,
+              "id": 929,
               "nodeType": "Block",
               "src": "350:8:1",
               "statements": []
             },
             "documentation": null,
-            "id": 963,
+            "id": 930,
             "implemented": true,
             "isConstructor": true,
             "isDeclaredConst": false,
@@ -811,26 +811,26 @@
             "name": "Debuggable",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 960,
+              "id": 927,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "340:2:1"
             },
             "payable": false,
             "returnParameters": {
-              "id": 961,
+              "id": 928,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "350:0:1"
             },
-            "scope": 964,
+            "scope": 931,
             "src": "321:37:1",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 965,
+        "scope": 932,
         "src": "27:334:1"
       }
     ],
@@ -842,5 +842,5 @@
   },
   "networks": {},
   "schemaVersion": "2.0.0",
-  "updatedAt": "2018-05-03T16:01:16.585Z"
+  "updatedAt": "2018-05-08T20:24:44.983Z"
 }
