@@ -524,11 +524,11 @@ contract('PullRequests', function(accounts) {
     assert.notEqual(distenseAddress, updated)
   })
 
-  it('should set DistenseAddress', async function() {
-    const distenseAddress = await pullRequests.DistenseAddress.call()
-    await pullRequests.setDistenseAddress(accounts[6])
+  it('should setTasksAddress', async function() {
+    const tasksAddress = await pullRequests.TasksAddress.call()
+    await pullRequests.setTasksAddress(accounts[6])
 
-    const updated = await pullRequests.DistenseAddress.call()
-    assert.notEqual(distenseAddress, updated)
+    const updated = await pullRequests.TasksAddress.call()
+    assert.notEqual(tasksAddress, updated)
   })
 })

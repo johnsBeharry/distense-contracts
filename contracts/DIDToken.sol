@@ -75,13 +75,9 @@ contract DIDToken is Approvable, Debuggable {
         DIDHolders[_address].balance = SafeMath.sub(DIDHolders[_address].balance, numDID);
 
         //  If DIDHolder has exchanged all of their DID remove from DIDHoldersArray
+
         if (DIDHolders[_address].balance == 0) {
-            if (DIDHoldersArray.length > 1) {
-                address lastElement = DIDHoldersArray[DIDHoldersArray.length - 1];
-                DIDHoldersArray[DIDHolders[_address].DIDHoldersIndex] = lastElement;
-                DIDHoldersArray.length--;
-                delete DIDHolders[msg.sender];
-            }
+            deleteDIDHolderWhenBalanceZero(_address);
         }
 
         emit LogDecrementDID(_address, numDID);
@@ -114,12 +110,7 @@ contract DIDToken is Approvable, Debuggable {
         msg.sender.transfer(numWeiToIssue);
 
         if (DIDHolders[msg.sender].balance == 0) {
-            if (DIDHoldersArray.length > 1) {
-                address lastElement = DIDHoldersArray[DIDHoldersArray.length - 1];
-                DIDHoldersArray[DIDHolders[msg.sender].DIDHoldersIndex] = lastElement;
-                DIDHoldersArray.length--;
-                delete DIDHolders[msg.sender];
-            }
+            deleteDIDHolderWhenBalanceZero(msg.sender);
         }
         emit LogExchangeDIDForEther(msg.sender, numDIDToExchange);
 
@@ -209,6 +200,24 @@ contract DIDToken is Approvable, Debuggable {
     function calculateNumWeiToIssue(uint256 _numDIDToExchange, uint256 _DIDPerEther) public pure returns (uint256) {
         _numDIDToExchange = _numDIDToExchange * 1 ether;
         return SafeMath.div(_numDIDToExchange, _DIDPerEther);
+    }
+
+    function deleteDIDHolderWhenBalanceZero(address holder) internal {
+        if (DIDHoldersArray.length > 1) {
+            address lastElement = DIDHoldersArray[DIDHoldersArray.length - 1];
+            DIDHoldersArray[DIDHolders[holder].DIDHoldersIndex] = lastElement;
+            DIDHoldersArray.length--;
+            delete DIDHolders[holder];
+        }
+    }
+
+    function deleteDIDHolder(address holder) public onlyApproved {
+        if (DIDHoldersArray.length > 1) {
+            address lastElement = DIDHoldersArray[DIDHoldersArray.length - 1];
+            DIDHoldersArray[DIDHolders[holder].DIDHoldersIndex] = lastElement;
+            DIDHoldersArray.length--;
+            delete DIDHolders[holder];
+        }
     }
 
     function setDistenseAddress(address _distenseAddress) onlyApproved public  {

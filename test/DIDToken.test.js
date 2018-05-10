@@ -749,4 +749,31 @@ contract('DIDToken', function(accounts) {
     )
     assert.equal(numContributionsDID.toNumber(), web3.toWei(198000))
   })
+
+  it('deleteDIDHolder should delete DIDHolders', async function() {
+    //  make sure the contract has ether to return for the DID or this will fail
+    await didToken.issueDID(accounts[5], 101)
+    await didToken.issueDID(accounts[4], 100)
+    await didToken.incrementDIDFromContributions(accounts[4], 100)
+    await didToken.issueDID(accounts[3], 102)
+    await didToken.issueDID(accounts[0], 102)
+    await didToken.incrementDIDFromContributions(accounts[0], 20000)
+
+    let numDIDHolders = await didToken.getNumDIDHolders.call()
+    assert.equal(
+      numDIDHolders.toString(),
+      4,
+      'should only be 4 DID holders here'
+    )
+
+    await didToken.approve(accounts[0])
+    await didToken.deleteDIDHolder(accounts[4])
+
+    numDIDHolders = await didToken.getNumDIDHolders.call()
+    assert.equal(
+      numDIDHolders.toString(),
+      3,
+      'should only be 3 DID holders here'
+    )
+  })
 })
