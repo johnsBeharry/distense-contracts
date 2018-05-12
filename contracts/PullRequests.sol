@@ -59,7 +59,7 @@ contract PullRequests is Approvable, Debuggable {
     }
 
     function approvePullRequest(bytes32 _prId)
-        hasEnoughDIDToApprovePR()
+        hasEnoughDIDToApprovePR
         external
     returns (uint256) {
 
