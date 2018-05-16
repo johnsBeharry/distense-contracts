@@ -11144,6 +11144,12 @@
     "version": "0.4.23+commit.124ca40d.Emscripten.clang"
   },
   "networks": {
+    "1": {
+      "events": {},
+      "links": {},
+      "address": "0x8bdaead6209cdccfa3f7d570f8726a8fe7dd1e50",
+      "transactionHash": "0xb88f7889d28f2a2aafa76ec63a13688f5ec474b5e6b1456ab79eaba5b14275b6"
+    },
     "3": {
       "events": {},
       "links": {},

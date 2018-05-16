@@ -24946,6 +24946,13 @@
     "version": "0.4.23+commit.124ca40d.Emscripten.clang"
   },
   "networks": {
+    "1": {
+      "events": {},
+      "address": "0xc62bc96310653a12ccde2cba179042f7963d6d81",
+      "links": {
+        "SafeMath": "0x189fb5cb79eddebe6a343a79857352c4a48989fa"
+      }
+    },
     "3": {
       "events": {
         "0x3433529aaca741f54b3397d6ef2d588bb92ecd0d87c4c41db2f379bfe5c168f4": {

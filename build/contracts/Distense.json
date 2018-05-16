@@ -18394,6 +18394,12 @@
       "links": {},
       "address": "0x9fa38b30ee668a2182b817e39b936c2daafb7f55",
       "transactionHash": "0xca003598ba793c51814fc9912947a4f8ef7a7915a0a9e5d8162a31d8a29846db"
+    },
+    "1": {
+      "events": {},
+      "links": {},
+      "address": "0x11C54402442951Cf0b0e0333310E881539368984",
+      "transactionHash": "0x2a0eaa2662c674259605b1416e7a7e2dcf8b4fc63970655d274190e275cddeed"
     }
   },
   "schemaVersion": "2.0.0",
