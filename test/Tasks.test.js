@@ -19,20 +19,23 @@ module.exports.increaseTime = addSeconds => {
 contract('Tasks', function(accounts) {
   const task = {
     taskId:
-      '0x856761ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9',
+      '0x8246123ab17f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b7000',
     title: 'Some amazing task'
   }
 
   const taskTwo = {
-    taskId:
-      '0x8546123ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9',
+    taskId: '0x8546123ab17f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b7',
     title: 'Another amazing task'
   }
 
   const taskThree = {
-    taskId:
-      '0x4246123ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9',
+    taskId: '0x4246123ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75',
     title: 'Yet another amazing task'
+  }
+
+  const taskFour = {
+    taskId: '0x2446123ab87f7b123dc438fb62e937c62aa3afe97740462295efa331324',
+    title: 'OMG another amazing task'
   }
 
   const pullRequest = {
@@ -617,7 +620,7 @@ contract('Tasks', function(accounts) {
     tasks = await Tasks.new(didToken.address, distense.address)
     await tasks.addTask(taskTwo.taskId, taskTwo.title)
     await tasks.addTask(task.taskId, task.title)
-    await tasks.addTask(task.taskId, task.title)
+    await tasks.addTask(taskFour.taskId, taskFour.title)
     await tasks.addTask(taskThree.taskId, taskThree.title)
 
     await tasks.taskRewardVote(task.taskId, 3000, {
@@ -631,7 +634,7 @@ contract('Tasks', function(accounts) {
     )
     await pullRequests.addPullRequest(
       pullRequest.id,
-      pullRequest.taskId,
+      task.taskId,
       pullRequest.prNum
     )
 
@@ -664,7 +667,7 @@ contract('Tasks', function(accounts) {
 
     numTaskIds = await tasks.getNumTasks.call()
     assert.equal(numTaskIds.toString(), '3', 'double check there are 2 taskIds')
-
+    //
     const taskExists = await tasks.getTaskById.call(task.taskId)
     assert.equal(
       taskExists[0].toString(),
@@ -682,7 +685,7 @@ contract('Tasks', function(accounts) {
     tasks = await Tasks.new(didToken.address, distense.address)
     await tasks.addTask(taskTwo.taskId, taskTwo.title)
     await tasks.addTask(task.taskId, task.title)
-    await tasks.addTask(task.taskId, task.title)
+    await tasks.addTask(taskFour.taskId, taskFour.title)
     await tasks.addTask(taskThree.taskId, taskThree.title)
 
     await tasks.taskRewardVote(task.taskId, 3000, {
@@ -699,7 +702,7 @@ contract('Tasks', function(accounts) {
       pullRequest.taskId,
       pullRequest.prNum
     )
-
+    //
     await didToken.approve(pullRequests.address)
     const pullRequestsDIDTokenApproved = await didToken.approved.call(
       pullRequests.address
@@ -750,5 +753,23 @@ contract('Tasks', function(accounts) {
 
     const updated = await tasks.DistenseAddress.call()
     assert.notEqual(distenseAddress, updated)
+  })
+
+  it('should correctly reject duplicate tasks', async function() {
+    await didToken.issueDID(accounts[0], 10000000)
+    await didToken.issueDID(accounts[2], 10000000)
+    await didToken.incrementDIDFromContributions(accounts[0], 10000000)
+    await didToken.incrementDIDFromContributions(accounts[2], 10000000)
+
+    await tasks.addTask(taskTwo.taskId, taskTwo.title)
+
+    let anError
+    try {
+      await tasks.addTask(taskTwo.taskId, taskTwo.title)
+    } catch (err) {
+      console.error(err)
+      anError = err
+    }
+    assert.notEqual(anError, undefined)
   })
 })

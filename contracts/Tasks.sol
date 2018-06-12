@@ -29,20 +29,22 @@ contract Tasks is Approvable, Debuggable {
     }
 
     mapping(bytes32 => Task) tasks;
+    mapping(bytes32 => bool) tasksTitles;
 
     event LogAddTask(bytes32 taskId, string title);
     event LogTaskRewardVote(bytes32 taskId, uint256 reward, uint256 pctDIDVoted);
     event LogTaskRewardDetermined(bytes32 taskId, uint256 reward);
-
-    uint256 FLOAT_CONSTANT = 1000000000;
 
     function Tasks (address _DIDTokenAddress, address _DistenseAddress) public {
         DIDTokenAddress = _DIDTokenAddress;
         DistenseAddress = _DistenseAddress;
     }
 
-    function addTask(bytes32 _taskId, string _title) external hasEnoughDIDToAddTask() returns
-    (bool) {
+    function addTask(bytes32 _taskId, string _title) external hasEnoughDIDToAddTask returns
+        (bool) {
+
+        bytes32 titleBytes32 = keccak256(_title);
+        require(!tasksTitles[titleBytes32], "Task title already exists");
 
         Distense distense = Distense(DistenseAddress);
 
@@ -52,11 +54,11 @@ contract Tasks is Approvable, Debuggable {
         tasks[_taskId].rewardStatus = RewardStatus.TENTATIVE;
 
         taskIds.push(_taskId);
+        tasksTitles[titleBytes32] = true;
         tasks[_taskId].taskIdsIndex = taskIds.length - 1;
         emit LogAddTask(_taskId, _title);
 
         return true;
-
     }
 
     function getTaskById(bytes32 _taskId) external view returns (

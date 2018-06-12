@@ -6,7 +6,7 @@ import './Distense.sol';
 import './Debuggable.sol';
 import './Tasks.sol';
 
-contract PullRequests is Approvable, Debuggable {
+contract PullRequests is Approvable {
 
     address public DIDTokenAddress;
     address public DistenseAddress;
@@ -63,7 +63,7 @@ contract PullRequests is Approvable, Debuggable {
         external
     returns (uint256) {
 
-        require(pullRequests[_prId].voted[msg.sender] == false);
+        require(pullRequests[_prId].voted[msg.sender] == false, "voter already voted on this PR");
         require(pullRequests[_prId].contributor != msg.sender, "contributor voted on their PR");
         Distense distense = Distense(DistenseAddress);
         DIDToken didToken = DIDToken(DIDTokenAddress);
@@ -74,28 +74,31 @@ contract PullRequests is Approvable, Debuggable {
         _pr.voted[msg.sender] = true;
 
         //  This is not very gas efficient at all but the stack was too deep.  Need to refactor/research ways to improve
+        //  Increment _pr.pctDIDApproved by the lower of the votingPowerLimitParameter or the voters pctDIDOwned
         _pr.pctDIDApproved += didToken.pctDIDOwned(msg.sender) > distense.getParameterValueByTitle(
             distense.votingPowerLimitParameterTitle()
         ) ? distense.getParameterValueByTitle(
             distense.votingPowerLimitParameterTitle()
         ) : didToken.pctDIDOwned(msg.sender);
 
-        //  where the magic happens
         if (
             _pr.pctDIDApproved > distense.getParameterValueByTitle(
                 distense.pctDIDRequiredToMergePullRequestTitle()
             )
         ) {
             Tasks tasks = Tasks(TasksAddress);
+
             uint256 reward;
             Tasks.RewardStatus rewardStatus;
-            (reward , rewardStatus) = tasks.getTaskRewardAndStatus(_pr.taskId);
+            (reward, rewardStatus) = tasks.getTaskRewardAndStatus(_pr.taskId);
 
             require(rewardStatus != Tasks.RewardStatus.PAID);
             Tasks.RewardStatus updatedRewardStatus = tasks.setTaskRewardPaid(_pr.taskId);
+
             //  Only issueDID after we confirm taskRewardPaid
             require(updatedRewardStatus == Tasks.RewardStatus.PAID);
             didToken.rewardContributor(_pr.contributor, reward);
+
             emit LogRewardPullRequest(_prId, _pr.taskId, _pr.prNum);
         }
 

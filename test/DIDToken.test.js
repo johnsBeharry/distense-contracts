@@ -369,13 +369,13 @@ contract('DIDToken', function(accounts) {
       }
     )
 
-    // let investedAggregate = await didToken.investedAggregate.call()
-    //
-    // assert.equal(
-    //   investedAggregate.toString(),
-    //   web3.toWei(3),
-    //   'investedAggregate should be higher by 2 ether'
-    // )
+    let investedAggregate = await didToken.investedAggregate.call()
+
+    assert.equal(
+      investedAggregate.toString(),
+      web3.toWei(3),
+      'investedAggregate should be higher by 2 ether'
+    )
   })
 
   //  reviewed 4-14-2018 JJA
@@ -392,7 +392,7 @@ contract('DIDToken', function(accounts) {
     )
 
     const remainingWei = await didToken.getWeiAggregateMayInvest.call()
-    assert.equal(remainingWei.toString(), 9.998e21) // 9998
+    assert.equal(remainingWei.toString(), 9.9998e21)
   })
 
   //  reviewed 4-14-2018 JJA
@@ -775,5 +775,26 @@ contract('DIDToken', function(accounts) {
       3,
       'should only be 3 DID holders here'
     )
+  })
+
+  it('should set DIDHoldersIndex correctly', async function() {
+    let etherForDIDInvestError
+    await didToken.issueDID(accounts[0], 200000)
+    await didToken.incrementDIDFromContributions(accounts[0], 200000)
+
+    try {
+      await didToken.investEtherForDID({
+        from: accounts[0],
+        value: web3.toWei(2)
+      })
+    } catch (error) {
+      etherForDIDInvestError = error
+      console.error(`etherForDIDInvestError: ${etherForDIDInvestError}`)
+    }
+
+    const numContributionsDID = await didToken.getNumContributionsDID(
+      accounts[0]
+    )
+    assert.equal(numContributionsDID.toNumber(), web3.toWei(198000))
   })
 })

@@ -19,7 +19,7 @@ contract DIDToken is Approvable, Debuggable {
     address public PullRequestsAddress;
     address public DistenseAddress;
 
-    uint256 public investmentLimitAggregate  = 10000 ether;  // This is the max DID all addresses can receive from depositing ether
+    uint256 public investmentLimitAggregate  = 100000 ether;  // This is the max DID all addresses can receive from depositing ether
     uint256 public investmentLimitAddress = 100 ether;  // This is the max DID any address can receive from Ether deposit
     uint256 public investedAggregate = 1 ether;
 
@@ -44,7 +44,7 @@ contract DIDToken is Approvable, Debuggable {
         decimals = 18;
     }
 
-    function issueDID(address _recipient, uint256 _numDID) public onlyApproved returns (uint256) {
+    function issueDID(address _recipient, uint256 _numDID) public onlyApproved returns (bool) {
         require(_recipient != address(0));
         require(_numDID > 0);
 
@@ -55,12 +55,14 @@ contract DIDToken is Approvable, Debuggable {
         DIDHolders[_recipient].balance = SafeMath.add(balance, _numDID);
 
         //  If is a new DIDHolder, set their position in DIDHoldersArray
-        if (DIDHolders[_recipient].DIDHoldersIndex == 0)
-            DIDHolders[_recipient].DIDHoldersIndex = DIDHoldersArray.push(_recipient) - 1;
+        if (DIDHolders[_recipient].DIDHoldersIndex == 0) {
+            uint256 index = DIDHoldersArray.push(_recipient) - 1;
+            DIDHolders[_recipient].DIDHoldersIndex = index;
+        }
 
         emit LogIssueDID(_recipient, _numDID);
 
-        return DIDHolders[_recipient].balance;
+        return true;
     }
 
     function decrementDID(address _address, uint256 _numDID) external onlyApproved returns (uint256) {
@@ -75,7 +77,7 @@ contract DIDToken is Approvable, Debuggable {
         DIDHolders[_address].balance = SafeMath.sub(DIDHolders[_address].balance, numDID);
 
         //  If DIDHolder has exchanged all of their DID remove from DIDHoldersArray
-
+        //  For minimizing blockchain size and later client query performance
         if (DIDHolders[_address].balance == 0) {
             deleteDIDHolderWhenBalanceZero(_address);
         }
@@ -89,13 +91,13 @@ contract DIDToken is Approvable, Debuggable {
         external
     returns (uint256) {
 
+        uint256 numDIDToExchange = _numDIDToExchange * 1 ether;
         uint256 netContributionsDID = getNumContributionsDID(msg.sender);
-        require(DIDHolders[msg.sender].netContributionsDID >= (_numDIDToExchange * 1 ether));
+        require(netContributionsDID >= numDIDToExchange);
 
         Distense distense = Distense(DistenseAddress);
         uint256 DIDPerEther = distense.getParameterValueByTitle(distense.didPerEtherParameterTitle());
 
-        uint256 numDIDToExchange = _numDIDToExchange * 1 ether;
         require(numDIDToExchange < totalSupply);
 
         uint256 numWeiToIssue = calculateNumWeiToIssue(numDIDToExchange, DIDPerEther);
@@ -166,11 +168,11 @@ contract DIDToken is Approvable, Debuggable {
         return (DIDFromContributions * 1 ether) / DIDPerEther;
     }
 
-    function rewardContributor(address _contributor, uint256 _reward) onlyApproved external returns (bool) {
+    function rewardContributor(address _contributor, uint256 _reward) external onlyApproved returns (bool) {
         uint256 reward = SafeMath.div(_reward, 1 ether);
-        issueDID(_contributor, reward);
+        bool issued = issueDID(_contributor, reward);
+        if (issued) incrementDIDFromContributions(_contributor, reward);
         incrementTasksCompleted(_contributor);
-        incrementDIDFromContributions(_contributor, reward);
     }
 
     function getWeiAggregateMayInvest() public view returns (uint256) {
