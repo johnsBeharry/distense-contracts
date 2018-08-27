@@ -5,7 +5,6 @@ module.exports = (deployer, network, accounts) => {
     if (!process.env.TESTING) {
       const coinbase = accounts[0]
       console.log(`coinbase: ${coinbase}`)
-      // console.log(`${accounts.length}`)
       console.log(`${accounts[0]}`)
       const initialDIDIssuances = {
         '0x19eDf992930Ad41Ec5B5aB0F1719421b17246C81': 24000,
@@ -20,7 +19,7 @@ module.exports = (deployer, network, accounts) => {
         '0xA9f570d8F799C7770021DfE6A58Fb91773F9a14F': 250,
         '0x0008c891ac2A5A8c45a36a9D9b9da13c73372281': 1200,
         '0x05da2ff5ab8f87d06c5234315e9e35a6b89636e2': 500,
-        '0x80e774718b3781d4527f0ecb0751074778870800': 75600,
+        '0x69b4f8a749f0a39f977e70b6313b4a4598908081 ': 75600,
         '0x5AAacb1025057f2aA2224cFC1Aa68d51dF9e9bf9': 10000
       }
 
