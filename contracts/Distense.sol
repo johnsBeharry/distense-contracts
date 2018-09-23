@@ -104,7 +104,7 @@ contract Distense is Approvable, Debuggable {
 
         maxRewardParameter = Parameter({
             title : maxRewardParameterTitle,
-            value: 5000 * 1 ether
+            value: 2000 * 1 ether
         });
         parameters[maxRewardParameterTitle] = maxRewardParameter;
         parameterTitles.push(maxRewardParameterTitle);
@@ -112,8 +112,8 @@ contract Distense is Approvable, Debuggable {
 
         numDIDRequiredToApproveVotePullRequestParameter = Parameter({
             title : numDIDRequiredToApproveVotePullRequestParameterTitle,
-            //     200 DID
-            value: 200 * 1 ether
+            //     100 DID
+            value: 100 * 1 ether
         });
         parameters[numDIDRequiredToApproveVotePullRequestParameterTitle] = numDIDRequiredToApproveVotePullRequestParameter;
         parameterTitles.push(numDIDRequiredToApproveVotePullRequestParameterTitle);
@@ -165,7 +165,7 @@ contract Distense is Approvable, Debuggable {
         didPerEtherParameter = Parameter({
             title : didPerEtherParameterTitle,
             //     1000
-            value: 1000 * 1 ether
+            value: 200 * 1 ether
         });
         parameters[didPerEtherParameterTitle] = didPerEtherParameter;
         parameterTitles.push(didPerEtherParameterTitle);
