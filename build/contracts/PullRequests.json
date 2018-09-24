@@ -11043,12 +11043,12 @@
   },
   "networks": {
     "1": {
-      "txHash": "0xad5ad959fd3ea8f6e1b35733f6b86c3b96f520b2fe5a390707cd6fa2bffc3716",
-      "address": "0xF23FF8cFc7DB3190B0045d971e65603ae03Ca567",
+      "txHash": "0x30e18d23c6c44ae2f6d8d52eaac95bcd290dd5de5ea1e0f5a24ca839fac58993",
+      "address": "0x39F42750D387645aE0455d2a899b946780E0074c",
       "links": {},
       "events": {}
     }
   },
   "schemaVersion": "2.0.1",
-  "updatedAt": "2018-09-24T19:00:26.821Z"
+  "updatedAt": "2018-09-24T19:48:49.781Z"
 }
