@@ -1,11 +1,10 @@
-pragma solidity ^0.4.23;
+pragma solidity ^0.4.24;
 
 import './lib/Approvable.sol';
 import './Distense.sol';
-import './Debuggable.sol';
 import './lib/SafeMath.sol';
 
-contract DIDToken is Approvable, Debuggable {
+contract DIDToken is Approvable {
 
     using SafeMath for uint256;
 
@@ -37,7 +36,7 @@ contract DIDToken is Approvable, Debuggable {
     }
     mapping (address => DIDHolder) public DIDHolders;
 
-    function DIDToken () {
+    constructor () public {
         name = "Distense DID";
         symbol = "DID";
         totalSupply = 0;

@@ -1,11 +1,11 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.24;
 
 
 contract Approvable {
 
     mapping(address => bool) public approved;
 
-    function Approvable() public {
+    constructor () public {
         approved[msg.sender] = true;
     }
 

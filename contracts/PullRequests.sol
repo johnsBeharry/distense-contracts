@@ -1,9 +1,8 @@
-pragma solidity ^0.4.23;
+pragma solidity ^0.4.24;
 
 import './lib/Approvable.sol';
 import './DIDToken.sol';
 import './Distense.sol';
-import './Debuggable.sol';
 import './Tasks.sol';
 
 contract PullRequests is Approvable {
@@ -28,7 +27,7 @@ contract PullRequests is Approvable {
     event LogPullRequestApprovalVote(bytes32 _prId, uint256 pctDIDApproved);
     event LogRewardPullRequest(bytes32 _prId, bytes32 taskId, uint128 prNum);
 
-    function PullRequests (
+    constructor (
         address _DIDTokenAddress,
         address _DistenseAddress,
         address _TasksAddress

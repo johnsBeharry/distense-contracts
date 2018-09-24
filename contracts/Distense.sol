@@ -1,11 +1,11 @@
-pragma solidity ^0.4.23;
+pragma solidity ^0.4.24;
 
 import './lib/Approvable.sol';
 import './DIDToken.sol';
 import './lib/SafeMath.sol';
-import './Debuggable.sol';
 
-contract Distense is Approvable, Debuggable {
+contract Distense is Approvable {
+
     using SafeMath for uint256;
 
     address public DIDTokenAddress;
@@ -67,7 +67,7 @@ contract Distense is Approvable, Debuggable {
 
     event LogParameterValueUpdate(bytes32 title, uint256 value);
 
-    function Distense  (address _DIDTokenAddress) public {
+    constructor (address _DIDTokenAddress) public {
 
         DIDTokenAddress = _DIDTokenAddress;
 
@@ -79,8 +79,8 @@ contract Distense is Approvable, Debuggable {
         pctDIDToDetermineTaskRewardParameter = Parameter({
             title : pctDIDToDetermineTaskRewardParameterTitle,
             //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
-            //     So this is 25.00%
-            value: 25 * 1 ether
+            //     So this is 15.00%
+            value: 15 * 1 ether
         });
         parameters[pctDIDToDetermineTaskRewardParameterTitle] = pctDIDToDetermineTaskRewardParameter;
         parameterTitles.push(pctDIDToDetermineTaskRewardParameterTitle);

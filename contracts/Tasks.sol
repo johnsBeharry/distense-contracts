@@ -1,12 +1,10 @@
-pragma solidity ^0.4.23;
-
+pragma solidity ^0.4.24;
 
 import './DIDToken.sol';
 import './Distense.sol';
 import './lib/SafeMath.sol';
-import './Debuggable.sol';
 
-contract Tasks is Approvable, Debuggable {
+contract Tasks is Approvable {
 
     using SafeMath for uint256;
 
@@ -15,7 +13,7 @@ contract Tasks is Approvable, Debuggable {
 
     bytes32[] public taskIds;
 
-    enum RewardStatus {TENTATIVE, DETERMINED, PAID}
+    enum RewardStatus { TENTATIVE, DETERMINED, PAID }
 
     struct Task {
         string title;
@@ -35,7 +33,7 @@ contract Tasks is Approvable, Debuggable {
     event LogTaskRewardVote(bytes32 taskId, uint256 reward, uint256 pctDIDVoted);
     event LogTaskRewardDetermined(bytes32 taskId, uint256 reward);
 
-    function Tasks (address _DIDTokenAddress, address _DistenseAddress) public {
+    constructor (address _DIDTokenAddress, address _DistenseAddress) public {
         DIDTokenAddress = _DIDTokenAddress;
         DistenseAddress = _DistenseAddress;
     }
@@ -43,7 +41,7 @@ contract Tasks is Approvable, Debuggable {
     function addTask(bytes32 _taskId, string _title) external hasEnoughDIDToAddTask returns
         (bool) {
 
-        bytes32 titleBytes32 = keccak256(_title);
+        bytes32 titleBytes32 = keccak256(abi.encodePacked(_title));
         require(!tasksTitles[titleBytes32], "Task title already exists");
 
         Distense distense = Distense(DistenseAddress);
