@@ -1,3 +1,5 @@
+import { convertIntToSolidityInt } from "./helpers/utils"
+
 const web3 = global.web3
 const Tasks = artifacts.require('Tasks')
 const PullRequests = artifacts.require('PullRequests')
@@ -259,7 +261,7 @@ contract('PullRequests', function(accounts) {
     assert.equal(noError, undefined)
   })
 
-  it('approvePullRequest() should increment the pctDIDApproved correctly', async function() {
+  it.only('approvePullRequest() should increment the pctDIDApproved correctly', async function() {
     await didToken.issueDID(accounts[0], 1200000)
     await didToken.issueDID(accounts[1], 1200000)
     await didToken.issueDID(accounts[2], 1200000)
@@ -293,6 +295,10 @@ contract('PullRequests', function(accounts) {
       true,
       'pullRequests has to be tasks approved here'
     )
+
+    await tasks.taskRewardVote(pullRequest.taskId, 80, {
+      from: accounts[0]
+    })
 
     await pullRequests.approvePullRequest(pullRequest.id, {
       from: accounts[2]
