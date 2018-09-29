@@ -96,7 +96,7 @@ contract Distense is Approvable {
 
         votingIntervalParameter = Parameter({
             title : votingIntervalParameterTitle,
-            value: 1296000 * 1 ether// 15 * 86400 = 1.296e+6
+            value: 1296000 * 1 ether  // 15 * 86400 = 1.296e+6
         });
         parameters[votingIntervalParameterTitle] = votingIntervalParameter;
         parameterTitles.push(votingIntervalParameterTitle);

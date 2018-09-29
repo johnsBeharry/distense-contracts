@@ -161,10 +161,11 @@ contract Tasks is Approvable {
         return tasks[_taskId].reward;
     }
 
-    function getTaskRewardAndStatus(bytes32 _taskId) external view returns (uint256, RewardStatus) {
+    function getTaskForPullRequestApproval(bytes32 _taskId) external view returns (uint256, RewardStatus, uint256) {
         return (
             tasks[_taskId].reward,
-            tasks[_taskId].rewardStatus
+            tasks[_taskId].rewardStatus,
+            tasks[_taskId].pctDIDVoted
         );
     }
 

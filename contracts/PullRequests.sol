@@ -58,12 +58,15 @@ contract PullRequests is Approvable {
     }
 
     function approvePullRequest(bytes32 _prId)
-        hasEnoughDIDToApprovePR
         external
     returns (uint256) {
 
-        require(pullRequests[_prId].voted[msg.sender] == false, "voter already voted on this PR");
-        require(pullRequests[_prId].contributor != msg.sender, "contributor voted on their PR");
+        require(voterCanApprovePullRequest(_prId) == true);
+
+        uint256 taskReward;
+        //  This will fail if task doesn't have determined rewardStatus; serves as a functional modifier
+        taskReward = taskHasReachedDeterminedRewardStatus(_prId);
+
         Distense distense = Distense(DistenseAddress);
         DIDToken didToken = DIDToken(DIDTokenAddress);
 
@@ -71,32 +74,28 @@ contract PullRequests is Approvable {
 
         //  Record approval vote to prevent multiple voting
         _pr.voted[msg.sender] = true;
-
         //  This is not very gas efficient at all but the stack was too deep.  Need to refactor/research ways to improve
         //  Increment _pr.pctDIDApproved by the lower of the votingPowerLimitParameter or the voters pctDIDOwned
-        _pr.pctDIDApproved += didToken.pctDIDOwned(msg.sender) > distense.getParameterValueByTitle(
+        uint256 tentativePctDIDApproved;
+        tentativePctDIDApproved += didToken.pctDIDOwned(msg.sender) > distense.getParameterValueByTitle(
             distense.votingPowerLimitParameterTitle()
         ) ? distense.getParameterValueByTitle(
             distense.votingPowerLimitParameterTitle()
         ) : didToken.pctDIDOwned(msg.sender);
 
         if (
-            _pr.pctDIDApproved > distense.getParameterValueByTitle(
-                distense.pctDIDRequiredToMergePullRequestTitle()
-            )
+            tentativePctDIDApproved > distense.getParameterValueByTitle(
+            distense.pctDIDRequiredToMergePullRequestTitle()
+        )
         ) {
             Tasks tasks = Tasks(TasksAddress);
-
-            uint256 reward;
-            Tasks.RewardStatus rewardStatus;
-            (reward, rewardStatus) = tasks.getTaskRewardAndStatus(_pr.taskId);
-
-            require(rewardStatus != Tasks.RewardStatus.PAID);
             Tasks.RewardStatus updatedRewardStatus = tasks.setTaskRewardPaid(_pr.taskId);
 
             //  Only issueDID after we confirm taskRewardPaid
             require(updatedRewardStatus == Tasks.RewardStatus.PAID);
-            didToken.rewardContributor(_pr.contributor, reward);
+
+            _pr.pctDIDApproved = tentativePctDIDApproved;
+            didToken.rewardContributor(_pr.contributor, taskReward);
 
             emit LogRewardPullRequest(_prId, _pr.taskId, _pr.prNum);
         }
@@ -105,17 +104,38 @@ contract PullRequests is Approvable {
         return _pr.pctDIDApproved;
     }
 
-    modifier hasEnoughDIDToApprovePR() {
+    function voterCanApprovePullRequest(bytes32 _prId) internal view returns (bool){
 
         Distense distense = Distense(DistenseAddress);
         uint256 threshold = distense.getParameterValueByTitle(
             distense.numDIDRequiredToApproveVotePullRequestParameterTitle()
         );
 
-        DIDToken didToken = DIDToken(DIDTokenAddress);
+        require(pullRequests[_prId].voted[msg.sender] == false, "voter already voted on this PR");
+        require(pullRequests[_prId].contributor != msg.sender, "contributor voted on their PR");
 
-        require(didToken.getNumContributionsDID(msg.sender) > threshold);
-        _;
+        DIDToken didToken = DIDToken(DIDTokenAddress);
+        require(didToken.getNumContributionsDID(msg.sender) > threshold, "voter doesn\'t have enough DID");
+        return true;
+    }
+
+    function taskHasReachedDeterminedRewardStatus(bytes32 _prId) internal view returns (uint256) {
+
+        PullRequest storage _pr = pullRequests[_prId];
+        Distense distense = Distense(DistenseAddress);
+        Tasks tasks = Tasks(TasksAddress);
+        uint256 taskReward;
+        Tasks.RewardStatus taskRewardStatus;
+        uint256 pctDIDVoted;
+        (
+            taskReward,
+            taskRewardStatus,
+            pctDIDVoted
+        ) = tasks.getTaskForPullRequestApproval(_pr.taskId);
+
+        require(taskRewardStatus == Tasks.RewardStatus.DETERMINED);
+
+        return taskReward;
     }
 
     function setDIDTokenAddress(address _DIDTokenAddress) public onlyApproved {
