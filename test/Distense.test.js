@@ -20,7 +20,7 @@ const increaseTime = addSeconds => {
 contract('Distense contract', function(accounts) {
   const pctDIDToDetermineTaskRewardParameter = {
     title: 'pctDIDToDetermineTaskReward',
-    value: 25000000000000000000
+    value: 15000000000000000000
   }
 
   const pctDIDRequiredToMergePullRequest = {
@@ -38,12 +38,12 @@ contract('Distense contract', function(accounts) {
 
   const maxRewardParameter = {
     title: 'maxReward',
-    value: 5e21
+    value: 2e21
   }
 
   const numDIDRequiredToApproveVotePullRequestParameter = {
     title: 'numDIDReqApproveVotePullRequest',
-    value: 200000000000000000000
+    value: 100000000000000000000
   }
 
   const numDIDRequiredToTaskRewardVoteParameter = {
@@ -68,7 +68,7 @@ contract('Distense contract', function(accounts) {
 
   const didPerEtherParameter = {
     title: 'didPerEther',
-    value: 1e21
+    value: 200000000000000000000
   }
 
   const votingPowerLimitParameter = {
