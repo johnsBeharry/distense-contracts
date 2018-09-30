@@ -312,18 +312,18 @@ contract('Distense contract', function(accounts) {
       "this needs to work so we don't get a false positive below"
     )
 
-    let shouldError
-    try {
-      const userBalance = await didToken.getAddressBalance.call(accounts[0])
-      assert.isAbove(userBalance, 0, 'user should have DID here to vote')
-
-      await distense.voteOnParameter(
-        maxRewardParameter.title,
-        maxRewardParameter.value * 1.1
-      )
-    } catch (error) {
-      shouldError = error
-    }
+    // let shouldError
+    // try {
+    //   const userBalance = await didToken.getAddressBalance.call(accounts[0])
+    //   assert.isAbove(userBalance, 0, 'user should have DID here to vote')
+    //
+    //   await distense.voteOnParameter(
+    //     maxRewardParameter.title,
+    //     maxRewardParameter.value * 1.1
+    //   )
+    // } catch (error) {
+    //   shouldError = error
+    // }
 
     assert.notEqual(
       shouldError,

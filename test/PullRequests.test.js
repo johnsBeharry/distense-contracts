@@ -213,6 +213,9 @@ contract('PullRequests', function(accounts) {
     await didToken.incrementDIDFromContributions(accounts[1], 1200000)
 
     await tasks.addTask(pullRequest.taskId, 'some amazing title')
+    await tasks.taskRewardVote(pullRequest.taskId, 180, {
+      from: accounts[0]
+    })
     await pullRequests.addPullRequest(
       pullRequest.id,
       pullRequest.taskId,
@@ -261,7 +264,7 @@ contract('PullRequests', function(accounts) {
     assert.equal(noError, undefined)
   })
 
-  it.only('approvePullRequest() should increment the pctDIDApproved correctly', async function() {
+  it('approvePullRequest() should increment the pctDIDApproved correctly', async function() {
     await didToken.issueDID(accounts[0], 1200000)
     await didToken.issueDID(accounts[1], 1200000)
     await didToken.issueDID(accounts[2], 1200000)
@@ -308,6 +311,53 @@ contract('PullRequests', function(accounts) {
     assert.equal(votedOnPR[3].toNumber(), 20000000000000000000, '')
   })
 
+  it('approvePullRequest() fail when the task reward has not been voted on and determined', async function() {
+    await didToken.issueDID(accounts[0], 1200000)
+    await didToken.issueDID(accounts[1], 1200000)
+    await didToken.issueDID(accounts[2], 1200000)
+    await didToken.incrementDIDFromContributions(accounts[0], 1200000)
+    await didToken.incrementDIDFromContributions(accounts[1], 1200000)
+    await didToken.incrementDIDFromContributions(accounts[2], 1200000)
+
+    await tasks.addTask(pullRequest.taskId, 'some amazing title')
+    await pullRequests.addPullRequest(
+      pullRequest.id,
+      pullRequest.taskId,
+      pullRequest.prNum
+    )
+
+    await didToken.approve(pullRequests.address)
+    const pullRequestsDIDTokenApproved = await didToken.approved.call(
+      pullRequests.address
+    )
+    assert.equal(
+      pullRequestsDIDTokenApproved,
+      true,
+      'pullRequests has to be approved here'
+    )
+
+    await tasks.approve(pullRequests.address)
+    const pullRequestsTasksApproved = await tasks.approved.call(
+      pullRequests.address
+    )
+    assert.equal(
+      pullRequestsTasksApproved,
+      true,
+      'pullRequests has to be tasks approved here'
+    )
+
+    let error
+    try {
+      await pullRequests.approvePullRequest(pullRequest.id, {
+        from: accounts[2]
+      })
+    } catch (err) {
+      error = err
+    }
+    assert.notEqual(error, undefined, 'task reward not determined yet')
+
+  })
+
   it('should fire event "LogAddPullRequest" when addPullRequest is appropriately called', async function() {
     await didToken.incrementDIDFromContributions(accounts[5], 1200000)
 
@@ -337,7 +387,9 @@ contract('PullRequests', function(accounts) {
     await didToken.incrementDIDFromContributions(accounts[0], 1200000)
 
     await tasks.addTask(pullRequest.taskId, 'some amazing title')
-
+    await tasks.taskRewardVote(pullRequest.taskId, 80, {
+      from: accounts[0]
+    })
     await pullRequests.addPullRequest(
       pullRequest.id,
       pullRequest.taskId,
@@ -394,6 +446,9 @@ contract('PullRequests', function(accounts) {
     await didToken.incrementDIDFromContributions(accounts[0], 1200000)
 
     await tasks.addTask(pullRequest.taskId, 'some amazing title')
+    await tasks.taskRewardVote(pullRequest.taskId, 80, {
+      from: accounts[0]
+    })
 
     await pullRequests.addPullRequest(
       pullRequest.id,

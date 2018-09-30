@@ -106,16 +106,17 @@ contract PullRequests is Approvable {
 
     function voterCanApprovePullRequest(bytes32 _prId) internal view returns (bool){
 
-        Distense distense = Distense(DistenseAddress);
-        uint256 threshold = distense.getParameterValueByTitle(
-            distense.numDIDRequiredToApproveVotePullRequestParameterTitle()
-        );
-
         require(pullRequests[_prId].voted[msg.sender] == false, "voter already voted on this PR");
         require(pullRequests[_prId].contributor != msg.sender, "contributor voted on their PR");
 
         DIDToken didToken = DIDToken(DIDTokenAddress);
+        Distense distense = Distense(DistenseAddress);
+
+        uint256 threshold = distense.getParameterValueByTitle(
+            distense.numDIDRequiredToApproveVotePullRequestParameterTitle()
+        );
         require(didToken.getNumContributionsDID(msg.sender) > threshold, "voter doesn\'t have enough DID");
+
         return true;
     }
 
@@ -126,12 +127,10 @@ contract PullRequests is Approvable {
         Tasks tasks = Tasks(TasksAddress);
         uint256 taskReward;
         Tasks.RewardStatus taskRewardStatus;
-        uint256 pctDIDVoted;
         (
             taskReward,
-            taskRewardStatus,
-            pctDIDVoted
-        ) = tasks.getTaskForPullRequestApproval(_pr.taskId);
+            taskRewardStatus
+        ) = tasks.getTaskRewardAndStatus(_pr.taskId);
 
         require(taskRewardStatus == Tasks.RewardStatus.DETERMINED);
 
