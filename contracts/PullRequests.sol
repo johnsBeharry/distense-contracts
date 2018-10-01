@@ -104,7 +104,7 @@ contract PullRequests is Approvable {
         return _pr.pctDIDApproved;
     }
 
-    function voterCanApprovePullRequest(bytes32 _prId) internal view returns (bool){
+    function voterCanApprovePullRequest(bytes32 _prId) internal view returns (bool) {
 
         require(pullRequests[_prId].voted[msg.sender] == false, "voter already voted on this PR");
         require(pullRequests[_prId].contributor != msg.sender, "contributor voted on their PR");
