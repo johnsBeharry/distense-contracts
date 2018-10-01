@@ -295,8 +295,9 @@ contract('Distense contract', function(accounts) {
     let shouldntError
     // make sure first vote passes for test validity
     try {
-      const userBalance = await didToken.getAddressBalance.call(accounts[0])
-      assert.isAbove(userBalance, 0, 'user should have DID here to vote')
+      // const userBalance = await didToken.getAddressBalance.call(accounts[0])
+      // console.log(`userBalance: ${userBalance}`)
+      // assert.isAbove(userBalance, 0, 'user should have DID here to vote')
 
       await distense.voteOnParameter(
         maxRewardParameter.title,
@@ -312,18 +313,15 @@ contract('Distense contract', function(accounts) {
       "this needs to work so we don't get a false positive below"
     )
 
-    // let shouldError
-    // try {
-    //   const userBalance = await didToken.getAddressBalance.call(accounts[0])
-    //   assert.isAbove(userBalance, 0, 'user should have DID here to vote')
-    //
-    //   await distense.voteOnParameter(
-    //     maxRewardParameter.title,
-    //     maxRewardParameter.value * 1.1
-    //   )
-    // } catch (error) {
-    //   shouldError = error
-    // }
+    let shouldError
+    try {
+      await distense.voteOnParameter(
+        maxRewardParameter.title,
+        maxRewardParameter.value * 1.1
+      )
+    } catch (error) {
+      shouldError = error
+    }
 
     assert.notEqual(
       shouldError,
@@ -335,9 +333,6 @@ contract('Distense contract', function(accounts) {
 
     let anotherError
     try {
-      const userBalance = await didToken.getAddressBalance.call(accounts[0])
-      assert.isAbove(userBalance, 0, 'user should have DID here to vote')
-
       await distense.voteOnParameter(
         maxRewardParameter.title,
         maxRewardParameter.value * 1.1
@@ -349,13 +344,6 @@ contract('Distense contract', function(accounts) {
   })
 
   it(`should allow voting only after the votingInterval has passed`, async function() {
-    const userBalance = await didToken.getNumContributionsDID(accounts[0])
-    assert.isAbove(
-      userBalance.toString(),
-      0,
-      'user should have DID here to vote'
-    )
-
     let contractError
     try {
       await distense.voteOnParameter(
@@ -400,13 +388,6 @@ contract('Distense contract', function(accounts) {
   })
 
   it(`should properly update the votingInterval parameter value when voted upon`, async function() {
-    const userBalance = await didToken.getNumContributionsDID.call(accounts[0])
-    assert.isAbove(
-      userBalance.toNumber(),
-      web3.toWei(200, 'ether'),
-      'user should have DID here to vote'
-    )
-
     await distense.voteOnParameter(votingIntervalParameter.title, 1)
 
     const newValue = await distense.getParameterValueByTitle.call(
@@ -597,7 +578,7 @@ contract('Distense contract', function(accounts) {
     )
     assert.equal(
       newContractValue.toString(),
-      20000000000000000000,
+      12000000000000000000,
       'updated value should be lower by the percentage of DID ownership of the voter'
     )
 

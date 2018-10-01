@@ -225,13 +225,13 @@ contract('DIDToken', function(accounts) {
     const didPerEther = await distense.getParameterValueByTitle('didPerEther')
     assert.equal(
       didPerEther.toString(),
-      1e21,
+      200000000000000000000,
       'make sure didPerEther is still 1000'
     )
 
     assert.equal(
       postInvestDIDBalance.toNumber(),
-      22000e18,
+      2.2e+22,
       'accounts[0] DID balance should be 22000e18'
     )
   })
@@ -301,7 +301,6 @@ contract('DIDToken', function(accounts) {
 
   it('should decrement the balance of DID of the DID exchanger', async function() {
     //  make sure the contract has ether to return for the DID or this will fail
-    // await didToken.issueDID(accounts[1], 2000)
     await didToken.incrementDIDFromContributions(accounts[1], 10000)
 
     //  Investor gets 4000 DID here
@@ -319,7 +318,7 @@ contract('DIDToken', function(accounts) {
     const updatedBalance = await didToken.getAddressBalance.call(accounts[1])
 
     // Investor has 3999 DID here
-    assert.equal(updatedBalance.toString(), 3.999e21)
+    assert.equal(updatedBalance.toString(), 799000000000000000000)
   })
 
   //  reviewed 4-14-2018 JJA
@@ -392,7 +391,7 @@ contract('DIDToken', function(accounts) {
     )
 
     const remainingWei = await didToken.getWeiAggregateMayInvest.call()
-    assert.equal(remainingWei.toString(), 9.9998e21)
+    assert.equal(remainingWei.toString(), 9.9998e+22)
   })
 
   //  reviewed 4-14-2018 JJA
@@ -669,7 +668,7 @@ contract('DIDToken', function(accounts) {
     const endingBalance = new BigNumber(
       numWeiThatShouldBeIssued.toString()
     ).add(etherBalance)
-    assert.isAbove(endingBalance.toString(), etherBalance.toString())
+    assert.isAbove(endingBalance.toNumber(), etherBalance.toNumber())
   })
 
   it('Reject exchange from those without enough contributions', async function() {
