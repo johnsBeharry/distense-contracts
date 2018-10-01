@@ -120,6 +120,8 @@ contract PullRequests is Approvable {
         return true;
     }
 
+    //    This function is here because it's only called from PullRequests,
+    //    so having it here saves a bit of gas
     function taskHasReachedDeterminedRewardStatus(bytes32 _prId) internal view returns (uint256) {
 
         PullRequest storage _pr = pullRequests[_prId];
