@@ -613,7 +613,7 @@ contract('Tasks', function(accounts) {
     await tasks.addTask(taskFour.taskId, taskFour.title)
     await tasks.addTask(taskThree.taskId, taskThree.title)
 
-    await tasks.taskRewardVote(task.taskId, 3000, {
+    await tasks.taskRewardVote(task.taskId, 1000, {
       from: accounts[0]
     })
 
@@ -678,7 +678,7 @@ contract('Tasks', function(accounts) {
     await tasks.addTask(taskFour.taskId, taskFour.title)
     await tasks.addTask(taskThree.taskId, taskThree.title)
 
-    await tasks.taskRewardVote(task.taskId, 3000, {
+    await tasks.taskRewardVote(task.taskId, 1000, {
       from: accounts[0]
     })
 
