@@ -148,13 +148,22 @@ contract Tasks is Approvable {
             distense.minNumberOfTaskRewardVotersParameterTitle()
         );
 
-        if (task.pctDIDVoted > pctDIDVotedThreshold || task.numVotes > SafeMath.div(minNumVoters, 1 ether)) {
-            emit LogTaskRewardDetermined(_taskId, task.reward);
-            task.rewardStatus = RewardStatus.DETERMINED;
-        }
+        updateRewardStatusIfAppropriate(_taskId, pctDIDVotedThreshold, minNumVoters);
 
         return true;
 
+    }
+
+    function updateRewardStatusIfAppropriate(bytes32 _taskId, uint256 pctDIDVotedThreshold, uint256 _minNumVoters)  internal returns (bool)  {
+
+        Task storage task = tasks[_taskId];
+
+    if (task.pctDIDVoted > pctDIDVotedThreshold || task.numVotes > SafeMath.div(_minNumVoters, 1 ether)) {
+            emit LogTaskRewardDetermined(_taskId, task.reward);
+            RewardStatus rewardStatus;
+            rewardStatus = RewardStatus.DETERMINED;
+            task.rewardStatus = rewardStatus;
+        }
     }
 
     function getTaskReward(bytes32 _taskId) external view returns (uint256) {

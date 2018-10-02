@@ -125,7 +125,6 @@ contract PullRequests is Approvable {
     function taskHasReachedDeterminedRewardStatus(bytes32 _prId) internal view returns (uint256) {
 
         PullRequest storage _pr = pullRequests[_prId];
-        Distense distense = Distense(DistenseAddress);
         Tasks tasks = Tasks(TasksAddress);
         uint256 taskReward;
         Tasks.RewardStatus taskRewardStatus;

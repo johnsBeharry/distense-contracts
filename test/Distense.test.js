@@ -599,7 +599,7 @@ contract('Distense contract', function(accounts) {
     )
     assert.equal(
       newContractValue.toString(),
-      24000000000000000000,
+      14400000000000000000,
       'updated value should be higher by the percentage of DID ownership of the voter'
     )
 
@@ -619,7 +619,7 @@ contract('Distense contract', function(accounts) {
     )
     assert.equal(
       newContractValue.toString(),
-      28800000000000000000,
+      17280000000000000000,
       'updated value should be higher by the percentage of DID ownership of the voter'
     )
   })

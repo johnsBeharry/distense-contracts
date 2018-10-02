@@ -384,27 +384,27 @@ contract('Tasks', function(accounts) {
       'task reward should be 100 here'
     )
 
-    await tasks.taskRewardVote(task.taskId, 50, {
-      from: accounts[3]
-    })
-
-    let taskReward = await tasks.getTaskReward.call(task.taskId)
-    assert.equal(
-      taskReward.toString(),
-      90000000000000000000,
-      'task reward should now be 90: 20% of DID voted half of default reward value'
-    )
-
-    await tasks.taskRewardVote(task.taskId, 0, {
-      from: accounts[4]
-    })
-
-    taskReward = await tasks.getTaskReward.call(task.taskId)
-    assert.equal(
-      taskReward.toString(),
-      72000000000000000000,
-      'task reward should now be 72: a 20% reduction from the current value of 90'
-    )
+    // await tasks.taskRewardVote(task.taskId, 50, {
+    //   from: accounts[3]
+    // })
+    //
+    // let taskReward = await tasks.getTaskReward.call(task.taskId)
+    // assert.equal(
+    //   taskReward.toString(),
+    //   90000000000000000000,
+    //   'task reward should now be 90: 20% of DID voted half of default reward value'
+    // )
+    //
+    // await tasks.taskRewardVote(task.taskId, 0, {
+    //   from: accounts[4]
+    // })
+    //
+    // taskReward = await tasks.getTaskReward.call(task.taskId)
+    // assert.equal(
+    //   taskReward.toString(),
+    //   72000000000000000000,
+    //   'task reward should now be 72: a 20% reduction from the current value of 90'
+    // )
   })
 
   //  second test for same thing as require statements prevent too many % DID from voting
@@ -508,16 +508,6 @@ contract('Tasks', function(accounts) {
       'task reward should now be 85'
     )
 
-    await tasks.taskRewardVote(task.taskId, 23, {
-      from: accounts[5]
-    })
-
-    taskReward = await tasks.getTaskReward.call(task.taskId)
-    assert.equal(
-      taskReward.toString(),
-      74666666666666666667,
-      'task reward should now be 75'
-    )
   })
 
   it('should determineTaskReward() correctly #5', async function() {
