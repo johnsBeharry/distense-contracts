@@ -26,7 +26,10 @@ contract Tasks is Approvable {
         uint256 taskIdsIndex;   // for easy later deletion to minimize query time and blockchain size
     }
 
+    // list of tasks
     mapping(bytes32 => Task) tasks;
+
+    // used to compare for duplicates
     mapping(bytes32 => bool) tasksTitles;
 
     event LogAddTask(bytes32 taskId, string title);
